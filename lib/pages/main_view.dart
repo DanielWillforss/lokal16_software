@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -95,28 +93,5 @@ class _MainViewState extends State<MainView> {
     setState(() {
     });
   };
-
-  //late Future<void> Function() reloadData = () async {
-  //  //bool gotOnlineData = 
-  //  await syncData(data, context);
-  //  setState(() {
-  //    //isOnline = gotOnlineData;
-  //  });
-  //};
-
-  //late Function adminEditData = (Data newData) async {
-  //  //bool gotOnlineData = 
-  //  await adminSyncData(newData, context);
-  //  setState(() {
-  //    data = newData;
-  //    //isOnline = gotOnlineData;
-  //  });
-  //};
-
-  //late Function flipIsOnline = () {
-  //  setState(() {
-  //    //isOnline = !isOnline;
-  //  });
-  //};
 }
 

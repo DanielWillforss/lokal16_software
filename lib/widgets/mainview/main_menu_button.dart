@@ -11,15 +11,11 @@ import 'package:lokal16_software/util/alerts.dart';
 class MainMenuButton extends StatelessWidget {
 
   final DataNew data;
-  //final bool isOnline;
-  //final Function flipIsOnline;
   final Function(Changes) updateData;
   final Future<void> Function() reloadData;
 
   const MainMenuButton({
     required this.data,
-    //required this.isOnline,
-    //required this.flipIsOnline,
     required this.updateData,
     required this.reloadData,
     super.key, 
@@ -39,9 +35,6 @@ class MainMenuButton extends StatelessWidget {
               });
             }
             break;
-          //case 'toggleOnline':
-          //  flipIsOnline();
-          //  break;
           case 'reload':
             AlertHandeler.dialogWhileComputing(context, reloadData);
           case 'findOverlap':
@@ -75,10 +68,6 @@ class MainMenuButton extends StatelessWidget {
           value: 'admin',
           child: Text('Adminsida'),
         ),
-        //PopupMenuItem<String>(
-        //  value: 'toggleOnline',
-        //  child: Text("Byt till ${isOnline ? "offline" : "online"}"),
-        //),
         const PopupMenuItem<String>(
           value: 'reload',
           child: Text("Uppdatera data"),

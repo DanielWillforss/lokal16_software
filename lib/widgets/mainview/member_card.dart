@@ -39,7 +39,6 @@ class MemberCard extends StatelessWidget {
           
           if(returnData != null) {
             await AlertHandeler.dialogWhileComputing(context, () async {
-              //await data.mergeWithPageReturn(returnData, name, context);
               await updateData(returnData.changes);
             });
           }
