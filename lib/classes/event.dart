@@ -78,7 +78,7 @@ class Event implements Comparable<Event>{
     }
   }
 
-  static bool isCheckedIn(List<Event> eventList) {
+  static bool isCheckedIn(Set<Event> eventList) {
     for(Event event in eventList) {
       if(Time.isBetween(Time.now(), event.startTime, event.endTime)) {
         return true;

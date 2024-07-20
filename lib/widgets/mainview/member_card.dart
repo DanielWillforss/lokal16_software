@@ -1,7 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:lokal16_software/classes/data/data.dart';
+import 'package:lokal16_software/classes/data/data_new.dart';
+import 'package:lokal16_software/classes/data/member_data.dart';
 import 'package:lokal16_software/classes/event.dart';
 import 'package:lokal16_software/util/alert_handeler.dart';
 import 'package:lokal16_software/visual/style.dart';
@@ -9,41 +10,37 @@ import 'package:lokal16_software/visual/style.dart';
 class MemberCard extends StatelessWidget {
 
   final String name;
-  final Data data;
-  final Function editData;
+  final DataNew data;
+  final Function updateData;
 
   const MemberCard({
     required this.name, 
     required this.data, 
-    required this.editData,
+    required this.updateData,
     super.key
   });
 
   @override
   Widget build(BuildContext context) {
 
-    Map<String, List<Event>> splitByPerson = data.getSplitByPerson();
+    Map<String, Set<Event>> splitByPerson = data.getSplitByName();
 
     return Card(
       child: FloatingActionButton(
-        backgroundColor: Style.memberButtonColor(Event.isCheckedIn(splitByPerson[name] ?? [])),
+        backgroundColor: Style.memberButtonColor(Event.isCheckedIn(splitByPerson[name] ?? {})),
         heroTag: name,
         onPressed: () async {
 
-          Map<String, dynamic>? returnData = await Navigator.pushNamed(
+          MemberData? returnData = await Navigator.pushNamed(
             context, 
             '/page', 
-            arguments: {
-              'name' : name,
-              'eventTypes' : data.eventTypes.toList(),
-              'eventList' : splitByPerson[name] ?? [],
-            }
-          ) as Map<String, dynamic>?;
+            arguments: data.getMemberData(name)
+          );
           
           if(returnData != null) {
             await AlertHandeler.dialogWhileComputing(context, () async {
-              await data.mergeWithPageReturn(returnData, name, context);
-              await editData(data);
+              //await data.mergeWithPageReturn(returnData, name, context);
+              await updateData(returnData.changes);
             });
           }
         },

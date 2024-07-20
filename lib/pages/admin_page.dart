@@ -1,7 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:lokal16_software/classes/data/data.dart';
+import 'package:lokal16_software/classes/data/admin_data.dart';
+import 'package:lokal16_software/classes/name.dart';
 import 'package:lokal16_software/util/alert_handeler.dart';
 import 'package:lokal16_software/visual/style.dart';
 
@@ -14,13 +15,13 @@ class AdminPage extends StatefulWidget {
 
 class _AdminPageState extends State<AdminPage> {
 
-  Data data = Data.empty();
+  AdminData data = AdminData(names: {}, types: {});
   bool hasChanged = false;
 
   @override
   Widget build(BuildContext context) {
 
-    data = ModalRoute.of(context)?.settings.arguments as Data? ?? data;
+    data = ModalRoute.of(context)?.settings.arguments as AdminData? ?? data;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -62,7 +63,7 @@ class _AdminPageState extends State<AdminPage> {
             ),
             DataCardList(
               isName: false,
-              objects: data.eventTypes,  
+              objects: data.types,  
               data: data,
               updateState: updateState,
             )
@@ -81,8 +82,8 @@ class _AdminPageState extends State<AdminPage> {
 
 class DataCardList extends StatelessWidget {
   
-  final Data data;
-  final List<String> objects;
+  final AdminData data;
+  final Set<dynamic> objects;
   final bool isName;
   final Function updateState;
 
@@ -102,7 +103,7 @@ class DataCardList extends StatelessWidget {
         children: [
           Expanded(
             flex: 3,
-            child: Center(child: Text(object))
+            child: Center(child: Text(object.toString()))
           ),
           Expanded(
             flex: 1,
@@ -110,7 +111,7 @@ class DataCardList extends StatelessWidget {
               onPressed: () {
                 isName ?
                   data.names.remove(object):
-                  data.eventTypes.remove(object)
+                  data.types.remove(object)
                 ;
                 updateState();
               },
@@ -156,8 +157,13 @@ class DataCardList extends StatelessWidget {
 
             if (result != null) {
               isName ? 
-                data.names.add(result) :
-                data.eventTypes.add(result);
+                data.names.add(Name(
+                  firstName: result,
+                  lastName: "test",
+                  personalNumber: "test",
+                  member: true,
+                )) :
+                data.types.add(result);
               updateState();
             }
           },

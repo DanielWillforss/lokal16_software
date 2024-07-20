@@ -3,8 +3,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:lokal16_software/classes/data/data.dart';
-import 'package:lokal16_software/util/data_util.dart';
+import 'package:lokal16_software/classes/changes.dart';
+import 'package:lokal16_software/classes/data/data_new.dart';
 import 'package:lokal16_software/visual/style.dart';
 import 'package:lokal16_software/widgets/mainview/main_menu_button.dart';
 import 'package:lokal16_software/widgets/mainview/member_web.dart';
@@ -19,20 +19,17 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
 
-  Data data = Data.empty();
-  bool isOnline = true;
+  DataNew data = DataNew();
   Timer? reloadPage;
+
 
   @override
   void initState() {
     super.initState();
     
     Future.microtask(() {
-      Map<String, dynamic> args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>? 
-      ?? {"data" : data, "isOnline" : isOnline};
       setState(() {
-        data = args["data"];
-        isOnline = args["isOnline"];    
+        data = ModalRoute.of(context)?.settings.arguments as DataNew? ?? data;
       });
     });
   }
@@ -67,28 +64,24 @@ class _MainViewState extends State<MainView> {
           ),
           actions: [
             MainMenuButton(
-              data: data, 
-              //isOnline: isOnline, 
-              //flipIsOnline: flipIsOnline, 
-              updateData: adminEditData,
-              reloadData: reloadData,
-            )
+              data: data,  
+              updateData: updateData,
+              reloadData: () async {
+                updateData(Changes());
+              }
+            ),
           ],
-        ),    
-        //floatingActionButton: Icon(
-        //  isOnline ? Icons.wifi : Icons.wifi_off, 
-        //  color: Colors.white,
-        //),    
+        ),     
         body: TabBarView(
           children: [
             MemberWeb(
               size: MediaQuery.of(context).size.width,
               data: data,
-              editData: editData,
+              updateData: updateData,
             ),
             MemberList(
               data: data,
-              editData: editData,
+              updateData: updateData,
             )
           ],
         )
@@ -96,32 +89,34 @@ class _MainViewState extends State<MainView> {
     );
   } 
 
-  late Function editData = (Data newData) async {
-    data = newData;
-    reloadData();
-  };
-
-  late Future<void> Function() reloadData = () async {
-    //bool gotOnlineData = 
-    await syncData(data, context, isOnline: isOnline);
+  late Function(Changes) updateData = (Changes changes) async {
+    data.mergeChanges(changes);
+    await data.uploadData(context);
     setState(() {
-      //isOnline = gotOnlineData;
     });
   };
 
-  late Function adminEditData = (Data newData) async {
-    //bool gotOnlineData = 
-    await adminSyncData(newData, context);
-    setState(() {
-      data = newData;
-      //isOnline = gotOnlineData;
-    });
-  };
+  //late Future<void> Function() reloadData = () async {
+  //  //bool gotOnlineData = 
+  //  await syncData(data, context);
+  //  setState(() {
+  //    //isOnline = gotOnlineData;
+  //  });
+  //};
 
-  late Function flipIsOnline = () {
-    setState(() {
-      //isOnline = !isOnline;
-    });
-  };
+  //late Function adminEditData = (Data newData) async {
+  //  //bool gotOnlineData = 
+  //  await adminSyncData(newData, context);
+  //  setState(() {
+  //    data = newData;
+  //    //isOnline = gotOnlineData;
+  //  });
+  //};
+
+  //late Function flipIsOnline = () {
+  //  setState(() {
+  //    //isOnline = !isOnline;
+  //  });
+  //};
 }
 

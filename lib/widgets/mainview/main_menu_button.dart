@@ -1,17 +1,19 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:lokal16_software/classes/data/data.dart';
+import 'package:lokal16_software/classes/changes.dart';
+import 'package:lokal16_software/classes/data/admin_data.dart';
+import 'package:lokal16_software/classes/data/data_new.dart';
 import 'package:lokal16_software/classes/event.dart';
 import 'package:lokal16_software/util/alert_handeler.dart';
 import 'package:lokal16_software/util/alerts.dart';
 
 class MainMenuButton extends StatelessWidget {
 
-  final Data data;
+  final DataNew data;
   //final bool isOnline;
   //final Function flipIsOnline;
-  final Function updateData;
+  final Function(Changes) updateData;
   final Future<void> Function() reloadData;
 
   const MainMenuButton({
@@ -30,10 +32,10 @@ class MainMenuButton extends StatelessWidget {
         switch (result) {
           case 'admin':
             await AlertHandeler.dialogWhileComputing(context, reloadData);
-            Data? newData = await Navigator.pushNamed(context, "/admin", arguments: data.deepCopy()) as Data?;
+            AdminData? newData = await Navigator.pushNamed(context, "/admin", arguments: data.getAdminData());
             if(newData != null) {
               AlertHandeler.dialogWhileComputing(context, () async {
-                await updateData(newData);
+                await updateData(newData.changes);
               });
             }
             break;
@@ -43,7 +45,7 @@ class MainMenuButton extends StatelessWidget {
           case 'reload':
             AlertHandeler.dialogWhileComputing(context, reloadData);
           case 'findOverlap':
-            bool found = data.findCollitions();
+            bool found = data.findOverlap();
             if(found) {
               AlertHandeler.newAlert(context, Alerts.collitions);
             } else {

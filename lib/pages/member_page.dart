@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:lokal16_software/classes/data/member_data.dart';
 import 'package:lokal16_software/classes/time/event_date.dart';
 import 'package:lokal16_software/classes/event.dart';
 import 'package:lokal16_software/classes/time/time.dart';
@@ -18,15 +19,19 @@ class MemberPage extends StatefulWidget {
 
 class _MemberPageState extends State<MemberPage> {
 
-  Map<String, dynamic> data = {
-    'name' : "",
-    'eventTypes' : <String>[],
-    'eventList' : <Event>[]
-  };
+  //Map<String, dynamic> data = {
+  //  'name' : "",
+  //  'eventTypes' : <String>[],
+  //  'eventList' : <Event>[]
+  //};
+  MemberData data = MemberData(
+    name: "",
+    types: {},
+    events: {},
+  );
 
   bool wasChanged = false;
   bool deleting = false;
-  Set<int> deletedEvents = {};
   EventDate currentDate = EventDate.now();
 
   @override
@@ -35,7 +40,7 @@ class _MemberPageState extends State<MemberPage> {
     
     Future.microtask(() {
       setState(() {
-        data = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>? ?? data;
+        data = ModalRoute.of(context)?.settings.arguments as MemberData? ?? data;
       });
     });
   }
@@ -44,7 +49,7 @@ class _MemberPageState extends State<MemberPage> {
   Widget build(BuildContext context) {
 
     List<Widget> cardList = [];
-    List<Event> eventList = data['eventList']; 
+    List<Event> eventList = data.events.toList(); 
     int i = 0;
 
     for(i = 0; i<eventList.length; i++) {
@@ -53,10 +58,10 @@ class _MemberPageState extends State<MemberPage> {
       if(showEvent(event)) {
         //Adding each eventCard
         cardList.add(EventCard(
-          name: data['name'], 
+          name: data.name, 
           updateEvent: updateEvent,
           updateEventTypes: updateEventTypes,
-          eventTypes: data['eventTypes'],
+          eventTypes: data.types,
           deleting: deleting,
           event: event, 
           previousEvent: i != 0 ? eventList[i-1] : null,
@@ -66,10 +71,10 @@ class _MemberPageState extends State<MemberPage> {
     }
     //Adding the "add new card"
     cardList.add(EventCard(
-      name: data['name'], 
+      name: data.name, 
       updateEvent: updateEvent,
       updateEventTypes: updateEventTypes,
-      eventTypes: data['eventTypes'],
+      eventTypes: data.types,
       deleting: false,
       event: null,
       previousEvent: i != 0 ? eventList[i-1] : null,
@@ -79,7 +84,7 @@ class _MemberPageState extends State<MemberPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Style.pink,
-        title: Center(child: Text(data['name'], style: Style.headerText)),
+        title: Center(child: Text(data.name, style: Style.headerText)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
@@ -87,11 +92,7 @@ class _MemberPageState extends State<MemberPage> {
               String? choice = await AlertHandeler.saveAndExit(context);
               if(choice != null) {
                 if(choice == "save") {
-                  Navigator.pop(context, <String, dynamic>{
-                    'eventTypes' : data['eventTypes'],
-                    'eventList' : data['eventList'],
-                    'deleted' : deletedEvents,
-                  });
+                  Navigator.pop(context, data);
                 } else if (choice == "exit") {
                   Navigator.pop(context);
                 }
@@ -136,9 +137,10 @@ class _MemberPageState extends State<MemberPage> {
 
   late Function(Event, String) updateEvent = (Event event, String message) {
 
-    List<Event> eventList = data['eventList'];
+    List<Event> eventList = data.events.toList();
     if(message == "newEvent") {
       eventList.add(event);
+      data.changes.addEvent(event);
     } else if(message == "updateEvent") {
       event.isChanged = true;
       for (int i = 0; i < eventList.length; i++) {
@@ -148,29 +150,25 @@ class _MemberPageState extends State<MemberPage> {
         }
       }
     } else if(message == "deleteEvent") {
-      eventList.remove(event);
       if(event.id != null) {
-        deletedEvents.add(event.id!);
+        data.changes.removeEvent(event);
       }
     } else {
       throw Exception();
     }
 
     setState(() {
-      data['eventList'] = eventList;
       wasChanged = true;
     });
   };
 
   late Function updateEventTypes = (String newType) {
 
-    List<String> eventTypes = data['eventTypes'];
-    if(!eventTypes.contains(newType)) {
-      eventTypes.add(newType);
+    if(!data.types.contains(newType)) {
+      data.types.add(newType);
     }
     
     setState(() {
-      data['eventTypes'] = eventTypes;
       wasChanged = true;
     });
   };

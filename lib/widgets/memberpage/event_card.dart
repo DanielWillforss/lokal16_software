@@ -10,7 +10,7 @@ class EventCard extends StatefulWidget {
   final String name;
   final Function(Event, String) updateEvent;
   final Function updateEventTypes;
-  final List<String> eventTypes;
+  final Set<String> eventTypes;
   final bool deleting;
   final Event? event;
   final Event? previousEvent;
@@ -314,7 +314,7 @@ class _EventCardState extends State<EventCard> {
   Future<String?> _showEventSelectionDialog(BuildContext context) async {
 
     TextEditingController customOptionController = TextEditingController();
-    late final List<String> options = widget.eventTypes;
+    late final List<String> options = widget.eventTypes.toList();
     
     final String? result = await showDialog<String>(
       context: context,

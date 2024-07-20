@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:googleapis/sheets/v4.dart' as sheets;
 import 'package:googleapis_auth/auth_io.dart';
-import 'package:lokal16_software/classes/data/data.dart';
-import 'package:lokal16_software/classes/data/api_data.dart';
-import 'package:lokal16_software/util/data_util.dart';
+import 'package:lokal16_software/classes/event.dart';
+import 'package:lokal16_software/classes/name.dart';
+import 'package:lokal16_software/classes/time/time.dart';
 
 class GoogleSheetsApi {
   final _scopes = [sheets.SheetsApi.spreadsheetsScope];
@@ -29,15 +29,15 @@ class GoogleSheetsApi {
 
     return formatData({
       'names' : data[0],
-      'eventTypes' : data[1],
-      'eventList' : data[2],
+      'types' : data[1],
+      'events' : data[2],
     });
   }
 
-  Future<void> updateSheetData(Data data) async {
+  Future<void> updateSheetData(ApiData data) async {
 
     List<String> sheetNames = ['Names','EventTypes','EventList',];
-    List<List<List<Object>>> cellValues = dataToCellValues(data);
+    List<List<List<Object>>> cellValues = _dataToCellValues(data);
 
     var sheetsApi = await _getSheetsApi();
     for(int i = 0; i<3; i++) {
@@ -84,4 +84,132 @@ class GoogleSheetsApi {
     
     return data;
   }
+
+  List<List<List<Object>>> _dataToCellValues(ApiData data) {
+    return [
+      _namesToData(data.names),
+      _typesToData(data.types),
+      _eventsToData(data.events),
+    ];
+  }
+
+  List<List<Object>> _namesToData(Set<Name> names) {
+    List<List<Object>> data = [];
+    for (Name name in names) {
+      data.add([
+        name.firstName,
+        name.lastName,
+        name.personalNumber,
+        name.member ? "200" : "20",
+      ]);
+    }
+    return data;
+  }
+
+  List<List<Object>> _typesToData(Set<String> types) {
+    List<List<Object>> data = [];
+    for(String id in types) {
+      data.add([id]);
+    }
+    return data;
+  }
+
+  List<List<Object>> _eventsToData(Set<Event> events) {
+    List<List<Object>> data = [];
+    for (Event event in events) {
+      data.add([
+        event.id.toString(),
+        event.startTime.toString(),
+        event.startTime.date.toString(),
+        event.startTime.time.toString(),
+        event.endTime == null ? "" : event.endTime.toString(),
+        event.endTime == null ? "" : event.endTime!.date.toString(),
+        event.endTime == null ? "" : event.endTime!.time.toString(),
+        event.duration() ?? "",
+        event.member,
+        event.eventType,
+      ]);
+    }
+    return data;
+  }
+
+  ApiData formatData(Map<String, dynamic> data) {
+    Set<Name> names = _dataToNames(data['names']);
+    Set<String> types = _dataToTypes(data['eventTypes']);
+    Set<Event> events = _dataToEvents(data['eventList']);
+
+    return ApiData(
+      names: names,
+      types: types,
+      events: events,
+    );
+  }
+
+  Set<Name> _dataToNames(List<List<Object>> data) {
+
+    Set<Name> dataList = {};
+    for (var element in data) {
+      if(element.toString().isNotEmpty) {
+        dataList.add(Name(
+          firstName: element[0] as String, 
+          lastName: element[1] as String, 
+          personalNumber: element[2] as String,
+          member: element[0] == "200" ? true : false,
+        ));
+      }
+    }
+    return dataList;
+  }
+
+  Set<String> _dataToTypes(List<List<Object>> data) {
+    Set<String> dataList = {};
+    for (var element in data) {
+      if(element.toString().isNotEmpty) {
+        dataList.add(element[0] as String);
+      }
+    }
+    return dataList;
+  }
+
+  Set<Event> _dataToEvents(List<List<Object>> data) {
+
+    //id - needed
+    //start - needed
+    //startdate
+    //startTime
+    //end - needed
+    //endDate
+    //endTime
+    //period
+    //person - needed
+    //aktivitet - needed
+
+
+    Set<Event> dataList = {};
+    for (var element in data) {
+      if(element.toString().isNotEmpty) {
+        dataList.add(Event(
+          member: element[8] as String, 
+          eventType: element[9] as String, 
+          startTime: Time.fromString(element[1].toString()),
+          endTime: element[4].toString().isNotEmpty ? Time.fromString(element[4].toString()) : null, 
+          id: element[0] == "null" ? null : int.parse(element[0] as String),
+        ));
+      }
+    }
+    return dataList;
+  }
+
+}
+
+class ApiData {
+  Set<Name> names;
+  Set<String> types;
+  Set<Event> events;
+
+  ApiData({
+    required this.names,
+    required this.types,
+    required this.events,
+  });
 }

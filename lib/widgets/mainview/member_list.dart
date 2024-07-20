@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:lokal16_software/classes/data/data.dart';
+import 'package:lokal16_software/classes/data/data_new.dart';
 import 'package:lokal16_software/classes/event.dart';
 import 'package:lokal16_software/widgets/mainview/member_card.dart';
 
 class MemberList extends StatelessWidget {
 
-  final Data data;
-  final Function editData;
+  final DataNew data;
+  final Function updateData;
 
   const MemberList({
     required this.data, 
-    required this.editData,
+    required this.updateData,
     super.key
   });
 
@@ -19,10 +19,10 @@ class MemberList extends StatelessWidget {
 
     List<String> namesList = [];
     List<String> notCheckedIn = [];
-    Map<String, List<Event>> splitByPerson = data.getSplitByPerson();
-
-    for(String name in data.names) {
-      if(Event.isCheckedIn(splitByPerson[name]?? [])) {
+    Map<String, Set<Event>> splitByPerson = data.getSplitByName();
+    Set<String> names = data.getNames();
+    for(String name in names) {
+      if(Event.isCheckedIn(splitByPerson[name]?? {})) {
         namesList.add(name);
       } else {
         notCheckedIn.add(name);
@@ -33,7 +33,7 @@ class MemberList extends StatelessWidget {
     List<Widget> list = namesList.map<Widget>((element) => MemberCard(
       name: element, 
       data: data,
-      editData: editData,
+      updateData: updateData,
     )).toList();
 
     if(list.length % 2 != 0) {

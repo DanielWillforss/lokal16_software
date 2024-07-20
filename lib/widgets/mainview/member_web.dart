@@ -1,21 +1,21 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:lokal16_software/classes/data/data.dart';
+import 'package:lokal16_software/classes/data/data_new.dart';
 import 'package:lokal16_software/classes/event.dart';
 import 'package:lokal16_software/visual/style.dart';
 import 'package:lokal16_software/widgets/mainview/member_card.dart';
 
 class MemberWeb extends StatefulWidget {
   final double size;
-  final Data data;
-  final Function editData;
+  final DataNew data;
+  final Function updateData;
 
   const MemberWeb({
     super.key, 
     required this.size, 
     required this.data,
-    required this.editData,
+    required this.updateData,
   });
 
   @override
@@ -58,7 +58,7 @@ class _MemberWebState extends State<MemberWeb> {
               midpoint: widget.size / 2,
               scaleRatio: scaleRatio, 
               data: widget.data,
-              editData: widget.editData,
+              updateData: widget.updateData,
             )
           ),
         ),
@@ -70,15 +70,15 @@ class _MemberWebState extends State<MemberWeb> {
 class PositionedStack extends StatelessWidget {
   final double midpoint;
   final double scaleRatio;
-  final Data data;
-  final Function editData;
+  final DataNew data;
+  final Function updateData;
 
   const PositionedStack({
     super.key, 
     required this.midpoint, 
     required this.scaleRatio, 
     required this.data,
-    required this.editData,
+    required this.updateData,
   });
 
   @override
@@ -91,10 +91,10 @@ class PositionedStack extends StatelessWidget {
 
     List<String> namesList = [];
     List<String> notCheckedIn = [];
-    Map<String, List<Event>> splitByPerson = data.getSplitByPerson();
+    Map<String, Set<Event>> splitByPerson = data.getSplitByName();
 
-    for(String name in data.names) {
-      if(Event.isCheckedIn(splitByPerson[name]?? [])) {
+    for(String name in data.getNames()) {
+      if(Event.isCheckedIn(splitByPerson[name]?? {})) {
         namesList.add(name);
       } else {
         notCheckedIn.add(name);
@@ -122,7 +122,7 @@ class PositionedStack extends StatelessWidget {
             child: MemberCard(
               name: namesList[i],
               data: data,
-              editData: editData,
+              updateData: updateData,
             ),
           ))
       ));
