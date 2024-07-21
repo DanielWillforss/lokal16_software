@@ -35,3 +35,20 @@ Map<String, Set<Event>> getSplitByPerson(Set<Event> events) {
   }
   return idMap;
 }
+
+double totalDuration(Set<Event> events) {
+  double sum = 0;
+  for (var event in events) {
+    sum += event.duration() ?? 0;
+  }
+  return sum;
+}
+
+bool isCheckedIn(Set<Event> eventList) {
+  for(Event event in eventList) {
+    if(Time.isBetween(Time.now(), event.startTime, event.endTime)) {
+      return true;
+    }
+  }
+  return false;
+}

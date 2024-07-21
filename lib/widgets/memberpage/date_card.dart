@@ -29,7 +29,7 @@ class DateCard extends StatelessWidget implements PreferredSizeWidget{
               date.stepBackward();
               changeToDate(date);
             },
-            child: const Text("<- Föregående", style: Style.headerText,),
+            child: const Text("< Föregående", style: Style.headerText,),
           ),
         ),
         Expanded(
@@ -37,7 +37,7 @@ class DateCard extends StatelessWidget implements PreferredSizeWidget{
             onPressed: () {
               showDatePicker(
                 context: context, 
-                initialDate: DateTime.now(),
+                initialDate: date.getDateTime(),
                 firstDate: DateTime(2000), 
                 lastDate: DateTime(2100),
               ).then((pickedTime) {
@@ -54,7 +54,7 @@ class DateCard extends StatelessWidget implements PreferredSizeWidget{
             style: OutlinedButton.styleFrom(
               side: BorderSide(
                 color: Time.sameDayAs(Time.now(), Time.fromEventDate(date)) 
-                  ? Style.blue 
+                  ? Colors.white 
                   : Style.pink, 
                 width: 2
               )
@@ -68,7 +68,7 @@ class DateCard extends StatelessWidget implements PreferredSizeWidget{
               date.stepForward();
               changeToDate(date);
             },
-            child: Text("Nästa ->", 
+            child: Text("Nästa >", 
               style: !Time.sameDayAs(Time.now(), Time.fromEventDate(date)) 
                 ? Style.headerText
                 : const TextStyle(

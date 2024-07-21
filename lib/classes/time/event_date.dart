@@ -17,6 +17,10 @@ class EventDate implements Comparable<EventDate>{
     _day = time.day;
   }
 
+  DateTime getDateTime() {
+    return DateTime(_year, _month, _day);
+  } 
+
   EventDate.now() {
     DateTime dateTime = DateTime.now();
     _year = dateTime.year;

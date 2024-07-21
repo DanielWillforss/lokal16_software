@@ -20,13 +20,12 @@ class GoogleSheetsApi {
 
   Future<ApiData> getAllData() async {
     List<Future> futures = [
-      _getStringData('Names!A1:A'),
-      _getStringData('EventTypes!A1:A'),
+      _getAllNames(),
+      _getAllTypes(),
       _getAllEvents(),
     ];
 
     List<dynamic> data = await Future.wait(futures);
-
     return formatData({
       'names' : data[0],
       'types' : data[1],
@@ -63,8 +62,15 @@ class GoogleSheetsApi {
     return sheets.SheetsApi(client);
   }
 
-  Future<List<List<Object>>> _getStringData(String path) async {
-    String activityData = path;
+  Future<List<List<Object>>> _getAllNames() async {
+    String activityData = 'Names!A1:D';
+    List<List<Object>> data = await _getSheetData(activityData);
+    
+    return data;
+  }
+
+  Future<List<List<Object>>> _getAllTypes() async {
+    String activityData = 'EventTypes!A1:A';
     List<List<Object>> data = await _getSheetData(activityData);
     return data;
   }
@@ -100,7 +106,7 @@ class GoogleSheetsApi {
         name.firstName,
         name.lastName,
         name.personalNumber,
-        name.member ? "200" : "20",
+        name.paidFee ?? "",
       ]);
     }
     return data;
@@ -125,7 +131,7 @@ class GoogleSheetsApi {
         event.endTime == null ? "" : event.endTime.toString(),
         event.endTime == null ? "" : event.endTime!.date.toString(),
         event.endTime == null ? "" : event.endTime!.time.toString(),
-        event.duration() ?? "",
+        event.duration()?.toStringAsFixed(2) ?? "",
         event.member,
         event.eventType,
       ]);
@@ -135,8 +141,8 @@ class GoogleSheetsApi {
 
   ApiData formatData(Map<String, dynamic> data) {
     Set<Name> names = _dataToNames(data['names']);
-    Set<String> types = _dataToTypes(data['eventTypes']);
-    Set<Event> events = _dataToEvents(data['eventList']);
+    Set<String> types = _dataToTypes(data['types']);
+    Set<Event> events = _dataToEvents(data['events']);
 
     return ApiData(
       names: names,
@@ -154,7 +160,7 @@ class GoogleSheetsApi {
           firstName: element[0] as String, 
           lastName: element[1] as String, 
           personalNumber: element[2] as String,
-          member: element[0] == "200" ? true : false,
+          paidFee: int.tryParse(element[3] as String),
         ));
       }
     }

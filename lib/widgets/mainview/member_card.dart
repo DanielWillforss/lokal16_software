@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:lokal16_software/classes/data/data_new.dart';
 import 'package:lokal16_software/classes/data/member_data.dart';
 import 'package:lokal16_software/classes/event.dart';
+import 'package:lokal16_software/classes/name.dart';
 import 'package:lokal16_software/util/alert_handeler.dart';
+import 'package:lokal16_software/util/data_util.dart';
 import 'package:lokal16_software/visual/style.dart';
 
 class MemberCard extends StatelessWidget {
 
-  final String name;
+  final Name name;
   final DataNew data;
   final Function updateData;
 
@@ -24,18 +26,18 @@ class MemberCard extends StatelessWidget {
   Widget build(BuildContext context) {
 
     Map<String, Set<Event>> splitByPerson = data.getSplitByName();
-
     return Card(
       child: FloatingActionButton(
-        backgroundColor: Style.memberButtonColor(Event.isCheckedIn(splitByPerson[name] ?? {})),
+        backgroundColor: Style.memberButtonColor(isCheckedIn(splitByPerson[name.toFullString()] ?? {})),
         heroTag: name,
         onPressed: () async {
 
+          MemberData arg = data.getMemberData(name);
           MemberData? returnData = await Navigator.pushNamed(
             context, 
             '/page', 
-            arguments: data.getMemberData(name)
-          );
+            arguments: arg,
+          ) as MemberData?;
           
           if(returnData != null) {
             await AlertHandeler.dialogWhileComputing(context, () async {
@@ -43,7 +45,7 @@ class MemberCard extends StatelessWidget {
             });
           }
         },
-        child: Text(name, textAlign: TextAlign.center,),
+        child: Text(name.toString(), textAlign: TextAlign.center,),
       ),
     );
   }

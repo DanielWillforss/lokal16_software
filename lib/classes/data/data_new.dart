@@ -29,11 +29,11 @@ class DataNew {
     return AdminData(names: _names.toSet(), types: _types.toSet());
   }
 
-  MemberData getMemberData(String name) {
+  MemberData getMemberData(Name name) {
     return MemberData(
       name: name,
       types: _types.toSet(),
-      events: getSplitByPerson(_events)[name] ?? {},
+      events: getSplitByPerson(_events)[name.toFullString()] ?? {},
     );
   }
 
@@ -41,8 +41,44 @@ class DataNew {
     return getSplitByPerson(_events);
   }
 
-  Set<String> getNames() {
-    return _names.map((name) => name.firstName).toSet();
+  List<Name> getNamesSortedByCheckin() {
+    Map<String, Set<Event>> eventsByperson = getSplitByPerson(_events);
+    List<Name> allNames = _getActiveMembersToList();
+    allNames.sort((a, b) {
+      
+      Set<Event> eventsA = eventsByperson[a.toFullString()] ?? {};
+      Set<Event> eventsB = eventsByperson[b.toFullString()] ?? {};
+      bool checkedInA = isCheckedIn(eventsA);
+      bool checkedInB = isCheckedIn(eventsB);
+      if(checkedInA && !checkedInB) {
+        return -1;
+      } else if(checkedInB && !checkedInA) {
+        return 1;
+      }
+      
+      int totalDurationA = totalDuration(eventsA).round();
+      int totalDurationB = totalDuration(eventsB).round();
+      if(totalDurationA != totalDurationB) {
+        return totalDurationB - totalDurationA;
+      }
+      
+      return a.compareTo(b);
+    });
+    return allNames;
+  }
+
+  List<Name> getNamesSortedByName() {
+    List<Name> allNames = _getActiveMembersToList();
+    allNames.sort();
+    return allNames;
+  }
+
+  List<Name> _getActiveMembersToList() {
+    List<Name> names = _names.toList();
+    names.removeWhere((name) {
+      return name.paidFee == null || name.paidFee! < 200;
+    });
+    return names;
   }
 
   Future<bool> initData(BuildContext context) async {
@@ -55,7 +91,7 @@ class DataNew {
           firstName: item['firstName'],
           lastName: item['lastName'],
           personalNumber: item['personalNumber'],
-          member: item['member'],
+          paidFee: item['paidFee'],
         );
       }).toSet;
       _types = jsonData['activities'];
@@ -66,11 +102,11 @@ class DataNew {
           startTime: Time.fromString(item['startTime']),
           endTime: item['endTime']  == "null" ? null : Time.fromString(item['endTime']),
           id: item['id'],
-          isChanged: item['isChanged'],
         );
       }).toSet();
 
       changes.fromJson(jsonData['changes']);
+      checkForTwin();
 
       return true;
     } catch (e) {
@@ -95,6 +131,7 @@ class DataNew {
     _events.removeAll(otherChanges.removedEvents);
 
     changes.mergeChanges(otherChanges);
+    checkForTwin();
   }
 
   Future<bool> uploadData(BuildContext context) async {
@@ -124,7 +161,8 @@ class DataNew {
             names: _names, 
             types: _types, 
             events: _events
-          ));
+          )
+        );
       } catch (e) {
         await AlertHandeler.newAlert(context, Alerts.apiError(e));
         connectedOnline = false;
@@ -141,6 +179,8 @@ class DataNew {
         await AlertHandeler.newAlert(context, Alerts.jsonError(e));
       }
     }
+
+    checkForTwin();
     return connectedOnline;
   }
 
@@ -187,5 +227,21 @@ class DataNew {
     jsonData['events'] = _events.map((item) => item.toJson()).toList();
     jsonData['changes'] = changes.toJson();
     return json.encode(jsonData);
+  }
+
+  void checkForTwin() {
+    Set<String> printName = {};
+    for (var name in _names) {
+      int oldLength = printName.length;
+      String asString = name.toString();
+      printName.add(asString);
+      if(printName.length == oldLength) {
+        printName.remove(asString);
+        Iterable<Name> twins = _names.where((name) => name.toString() == asString);
+        for (var twin in twins) {
+          twin.hasTwin = true;
+        }
+      }
+    }
   }
 }

@@ -6,7 +6,6 @@ class Event implements Comparable<Event>{
   late String eventType;
   late Time startTime;
   late Time? endTime;
-  late bool isChanged;
   
 
   Event({
@@ -15,7 +14,6 @@ class Event implements Comparable<Event>{
     required this.startTime,
     required this.endTime,
     this.id,
-    this.isChanged = false,
   });
 
   Map<String, dynamic> toJson() {
@@ -25,11 +23,10 @@ class Event implements Comparable<Event>{
       'startTime' : startTime.toString(),
       'endTime' : endTime.toString(),
       'id' : id,
-      'isChanged' : isChanged,
     };
   }
 
-  String? duration() {
+  double? duration() {
     if(endTime == null) {
       return null;
     }
@@ -39,8 +36,7 @@ class Event implements Comparable<Event>{
     Duration difference = dateTime1.difference(dateTime2);
     int differenceInMinutes = difference.inMinutes;
 
-    double fraction = differenceInMinutes / 60;
-    return fraction.toStringAsFixed(2);
+    return differenceInMinutes / 60;
   }
 
   @override
@@ -78,12 +74,5 @@ class Event implements Comparable<Event>{
     }
   }
 
-  static bool isCheckedIn(Set<Event> eventList) {
-    for(Event event in eventList) {
-      if(Time.isBetween(Time.now(), event.startTime, event.endTime)) {
-        return true;
-      }
-    }
-    return false;
-  }
+  
 }

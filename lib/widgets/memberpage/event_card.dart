@@ -1,28 +1,25 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:lokal16_software/classes/data/member_data.dart';
 import 'package:lokal16_software/classes/event.dart';
 import 'package:lokal16_software/classes/time/time.dart';
 import 'package:lokal16_software/visual/style.dart';
 
 class EventCard extends StatefulWidget {
 
-  final String name;
-  final Function(Event, String) updateEvent;
-  final Function updateEventTypes;
-  final Set<String> eventTypes;
+  final MemberData data;
+  final Function updateData;
   final bool deleting;
   final Event? event;
   final Event? previousEvent;
   final Event? nextEvent;
 
   const EventCard({
-    required this.event, 
-    required this.name,
-    required this.updateEvent,
-    required this.updateEventTypes,
-    required this.eventTypes,
+    required this.data,
+    required this.updateData,
     required this.deleting,
+    required this.event, 
     required this.previousEvent,
     required this.nextEvent,
     super.key
@@ -50,15 +47,25 @@ class _EventCardState extends State<EventCard> {
               onPressed: () {
                 _showEventSelectionDialog(context).then((result) {
                   if (result != null) {
+                    widget.data.removeEvent(widget.event!);
                     widget.event!.eventType = result;
-                    widget.updateEvent(widget.event!, "updateEvent");
+                    widget.data.addEvent(widget.event!);
+                    widget.updateData();
                   }
                 });
               },
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.white,
+                  width: 2,
+                ),
+                backgroundColor: Style.green,
+              ),
               child: Text(
                 widget.event!.eventType, 
                 style: const TextStyle(
                   fontSize: 20,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -82,8 +89,34 @@ class _EventCardState extends State<EventCard> {
           : Expanded(
             flex: 1,
             child: IconButton(
-              onPressed: () {
-                widget.updateEvent(widget.event!, "deleteEvent");
+              onPressed: () async {
+                bool? confirmation = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Radera händelse"),
+                      content: Text("Är du säker att du vill radera denna händelse?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(true); // Return 'Option 1' when pressed
+                          },
+                          child: const Text("Bekräfta"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Return 'Option 1' when pressed
+                          },
+                          child: const Text("Avbryt"),
+                        ),
+                      ],
+                    );
+                  }
+                );
+                if(confirmation == true) {
+                  widget.data.removeEvent(widget.event!);
+                  widget.updateData();
+                }
               },
               icon: const Icon(Icons.delete_outline, color: Colors.white,),
               color: Colors.black,
@@ -181,8 +214,10 @@ class _EventCardState extends State<EventCard> {
         );
       });
     } else {
+      widget.data.removeEvent(widget.event!);
       isStartTime ? widget.event!.startTime = newTime : widget.event!.endTime = newTime;
-      widget.updateEvent(widget.event!, "updateEvent");
+      widget.data.addEvent(widget.event!);
+      widget.updateData();
     }
   }
 
@@ -247,9 +282,16 @@ class _EventCardState extends State<EventCard> {
       checkoutAnyway = true;
     }
     if(checkoutAnyway?? false) {
-      event.endTime = !blocked ? Time.now() : event.startTime.deepCopy();
-      event.endTime!.incrementMinute();
-      widget.updateEvent(event, "updateEvent");
+      
+      widget.data.removeEvent(event);
+      if(blocked) {
+        event.endTime = event.startTime.deepCopy();
+        event.endTime!.incrementMinute();
+      } else {
+        event.endTime = Time.nowOtherDate(widget.data.currentDate);
+      }
+      widget.data.addEvent(event);
+      widget.updateData();
     }
     return checkoutAnyway?? false;
   }
@@ -267,7 +309,7 @@ class _EventCardState extends State<EventCard> {
       if(
         widget.previousEvent != null && 
         widget.previousEvent!.endTime != null && 
-        Time.isTimeBefore(Time.now(), widget.previousEvent!.endTime!) 
+        Time.isTimeBefore(Time.nowOtherDate(widget.data.currentDate), widget.previousEvent!.endTime!) 
       ) {
         blocked = true;
         addAnyway = await showDialog(context: context, builder: (BuildContext context) {
@@ -295,17 +337,28 @@ class _EventCardState extends State<EventCard> {
         addAnyway = true;
       }
       if(addAnyway?? false) {
-        _showEventSelectionDialog(context).then((result) {
-          if (result != null) {
-            Event newEvent = Event(
-              member: widget.name,
-              startTime: !blocked ? Time.now() : widget.previousEvent!.endTime!,
-              eventType: result,
-              endTime: null,
-            );
-            widget.updateEvent(newEvent, "newEvent");
+        String? result = await _showEventSelectionDialog(context); 
+        if (result != null) {
+          Time startTime;
+          Time? endTime;
+          if(Time.sameDayAs(Time.now(), Time.fromEventDate(widget.data.currentDate))) {
+            startTime = !blocked ? Time.now() : widget.previousEvent!.endTime!;
+            endTime = null;
+          } else {
+            startTime = !blocked ? Time.nowOtherDate(widget.data.currentDate) : widget.previousEvent!.endTime!;
+            endTime = startTime.deepCopy();
+            endTime.incrementMinute();
           }
-        });
+
+          Event newEvent = Event(
+            member: widget.data.name.toFullString(),
+            startTime: startTime,
+            eventType: result,
+            endTime: endTime,
+          );
+          widget.data.addEvent(newEvent);
+          widget.updateData();
+        }
       }
     }
     return addAnyway ?? false;
@@ -314,7 +367,7 @@ class _EventCardState extends State<EventCard> {
   Future<String?> _showEventSelectionDialog(BuildContext context) async {
 
     TextEditingController customOptionController = TextEditingController();
-    late final List<String> options = widget.eventTypes.toList();
+    late final List<String> options = widget.data.types.toList();
     
     final String? result = await showDialog<String>(
       context: context,
@@ -376,7 +429,8 @@ class _EventCardState extends State<EventCard> {
                   );
                 });
                 if(confirmation == true) {
-                  widget.updateEventTypes(customOption);
+                  widget.data.addType(customOption);
+                  widget.updateData();
                   Navigator.pop(context, customOption);
                 }
               },

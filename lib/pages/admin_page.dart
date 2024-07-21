@@ -161,7 +161,7 @@ class DataCardList extends StatelessWidget {
                   firstName: result,
                   lastName: "test",
                   personalNumber: "test",
-                  member: true,
+                  paidFee: 200,
                 )) :
                 data.types.add(result);
               updateState();

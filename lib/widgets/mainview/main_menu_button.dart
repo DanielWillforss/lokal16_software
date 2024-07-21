@@ -28,7 +28,7 @@ class MainMenuButton extends StatelessWidget {
         switch (result) {
           case 'admin':
             await AlertHandeler.dialogWhileComputing(context, reloadData);
-            AdminData? newData = await Navigator.pushNamed(context, "/admin", arguments: data.getAdminData());
+            AdminData? newData = await Navigator.pushNamed(context, "/admin", arguments: data.getAdminData()) as AdminData?;
             if(newData != null) {
               AlertHandeler.dialogWhileComputing(context, () async {
                 await updateData(newData.changes);
@@ -37,29 +37,26 @@ class MainMenuButton extends StatelessWidget {
             break;
           case 'reload':
             AlertHandeler.dialogWhileComputing(context, reloadData);
-          case 'findOverlap':
-            bool found = data.findOverlap();
-            if(found) {
-              AlertHandeler.newAlert(context, Alerts.collitions);
-            } else {
-              AlertHandeler.newAlert(context, Alerts.noCollitions);
-            }
-            break;
           case 'showOverlap':
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                List<Widget> list = data.overlapping.isEmpty 
-                  ? [const Center(child: Text("Inga överlappande händelser"))]
-                  : data.overlapping.map((Event event) =>
-                    Center(child: Text(event.toString()),)
-                  ).toList();
-                return SimpleDialog(
-                  title: const Center(child: Text("Alla överlappande händelser")),
-                  children: list,
-                );
-              },
-            );
+            bool found = data.findOverlap();
+            if(!found) {
+              AlertHandeler.newAlert(context, Alerts.noCollitions);
+            } else {   
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  List<Widget> list = data.overlapping.isEmpty 
+                    ? [const Center(child: Text("Inga överlappande händelser"))]
+                    : data.overlapping.map((Event event) =>
+                      Center(child: Text(event.toString()),)
+                    ).toList();
+                  return SimpleDialog(
+                    title: const Center(child: Text("Alla överlappande händelser")),
+                    children: list,
+                  );
+                },
+              );
+            }
             break;
         }
       },
@@ -71,10 +68,6 @@ class MainMenuButton extends StatelessWidget {
         const PopupMenuItem<String>(
           value: 'reload',
           child: Text("Uppdatera data"),
-        ),
-        const PopupMenuItem<String>(
-          value: 'findOverlap',
-          child: Text("Sök efter överlappande händelser"),
         ),
         const PopupMenuItem<String>(
           value: 'showOverlap',

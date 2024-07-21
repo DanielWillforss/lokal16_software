@@ -5,7 +5,7 @@ import 'package:lokal16_software/util/alerts.dart';
 
 class AlertHandeler {
   static Future<void> newAlert(BuildContext context, AlertText text) async {
-    showDialog(context: context, builder: (BuildContext context) {
+    await showDialog(context: context, builder: (BuildContext context) {
       return AlertDialog(
         title: Text(text.title),
         content: Text(text.content),

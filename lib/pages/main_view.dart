@@ -17,20 +17,8 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
 
-  DataNew data = DataNew();
+  DataNew? data;
   Timer? reloadPage;
-
-
-  @override
-  void initState() {
-    super.initState();
-    
-    Future.microtask(() {
-      setState(() {
-        data = ModalRoute.of(context)?.settings.arguments as DataNew? ?? data;
-      });
-    });
-  }
 
   @override
   void dispose() {
@@ -40,6 +28,8 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
+
+    data ??= ModalRoute.of(context)?.settings.arguments as DataNew? ?? DataNew();
 
     reloadPage?.cancel();
     reloadPage = Timer(const Duration(minutes: 1), () {
@@ -62,7 +52,7 @@ class _MainViewState extends State<MainView> {
           ),
           actions: [
             MainMenuButton(
-              data: data,  
+              data: data!,  
               updateData: updateData,
               reloadData: () async {
                 updateData(Changes());
@@ -73,12 +63,12 @@ class _MainViewState extends State<MainView> {
         body: TabBarView(
           children: [
             MemberWeb(
-              size: MediaQuery.of(context).size.width,
-              data: data,
+              size: MediaQuery.of(context).size,
+              data: data!,
               updateData: updateData,
             ),
             MemberList(
-              data: data,
+              data: data!,
               updateData: updateData,
             )
           ],
@@ -88,10 +78,9 @@ class _MainViewState extends State<MainView> {
   } 
 
   late Function(Changes) updateData = (Changes changes) async {
-    data.mergeChanges(changes);
-    await data.uploadData(context);
-    setState(() {
-    });
+    data!.mergeChanges(changes);
+    await data!.uploadData(context);
+    setState(() {});
   };
 }
 

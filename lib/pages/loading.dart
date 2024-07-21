@@ -39,7 +39,7 @@ class _LoadingState extends State<Loading> {
     DataNew data = DataNew();
     await data.initData(context);
     await data.uploadData(context);
-    
+
     Navigator.pushReplacementNamed(context, '/main', arguments: data); 
   }
 }

@@ -61,6 +61,21 @@ class Time implements Comparable<Time>{
     );
   }
 
+  Time.nowOtherDate(EventDate eventDate) {
+    DateTime dateTime = DateTime.now();
+    _date = EventDate(
+      eventDate.year, 
+      eventDate.month, 
+      eventDate.day
+    );
+
+    _time = EventTime(
+      dateTime.hour,
+      dateTime.minute,
+      0,
+    );
+  }
+
   void incrementMinute() {
     time.incrementMinute();
     if(time.minute == 0 && time.hour == 0) {

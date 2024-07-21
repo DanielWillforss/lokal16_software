@@ -73,7 +73,7 @@ class Changes {
         firstName: item['firstName'],
         lastName: item['lastName'],
         personalNumber: item['personalNumber'],
-        member: item['member'],
+        paidFee: item['paidFee'],
       );
     }).toSet;
     _addedTypes = json['addedTypes'];
@@ -84,7 +84,6 @@ class Changes {
         startTime: Time.fromString(item['startTime']),
         endTime: item['endTime']  == "null" ? null : Time.fromString(item['endTime']),
         id: item['id'],
-        isChanged: item['isChanged'],
       );
     }).toSet();
     _removedNames = json['removedNames'].map((item) {
@@ -92,7 +91,7 @@ class Changes {
         firstName: item['firstName'],
         lastName: item['lastName'],
         personalNumber: item['personalNumber'],
-        member: item['member'],
+        paidFee: item['paidFee'],
       );
     }).toSet();
     _removedTypes = json['removedTypes'];
@@ -103,7 +102,6 @@ class Changes {
         startTime: Time.fromString(item['startTime']),
         endTime: item['endTime']  == "null" ? null : Time.fromString(item['endTime']),
         id: item['id'],
-        isChanged: item['isChanged'],
       );
     }).toSet();
   }
