@@ -63,20 +63,20 @@ class GoogleSheetsApi {
   }
 
   Future<List<List<Object>>> _getAllNames() async {
-    String activityData = 'Names!A1:D';
+    String activityData = 'Names!A2:D';
     List<List<Object>> data = await _getSheetData(activityData);
     
     return data;
   }
 
   Future<List<List<Object>>> _getAllTypes() async {
-    String activityData = 'EventTypes!A1:A';
+    String activityData = 'EventTypes!A2:A';
     List<List<Object>> data = await _getSheetData(activityData);
     return data;
   }
 
   Future<List<List<Object>>> _getAllEvents() async {
-    String eventData = 'EventList!A1:J';
+    String eventData = 'EventList!A2:J';
     List<List<Object>> data = await _getSheetData(eventData);
     return data;
   }
@@ -101,6 +101,7 @@ class GoogleSheetsApi {
 
   List<List<Object>> _namesToData(Set<Name> names) {
     List<List<Object>> data = [];
+    data.add([]);
     for (Name name in names) {
       data.add([
         name.firstName,
@@ -114,6 +115,7 @@ class GoogleSheetsApi {
 
   List<List<Object>> _typesToData(Set<String> types) {
     List<List<Object>> data = [];
+    data.add([]);
     for(String id in types) {
       data.add([id]);
     }
@@ -122,6 +124,7 @@ class GoogleSheetsApi {
 
   List<List<Object>> _eventsToData(Set<Event> events) {
     List<List<Object>> data = [];
+    data.add([]);
     for (Event event in events) {
       data.add([
         event.id.toString(),
