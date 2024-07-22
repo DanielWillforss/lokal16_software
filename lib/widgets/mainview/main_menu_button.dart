@@ -27,12 +27,9 @@ class MainMenuButton extends StatelessWidget {
       onSelected: (String result) async {
         switch (result) {
           case 'admin':
-            await AlertHandeler.dialogWhileComputing(context, reloadData);
             AdminData? newData = await Navigator.pushNamed(context, "/admin", arguments: data.getAdminData()) as AdminData?;
-            if(newData != null) {
-              AlertHandeler.dialogWhileComputing(context, () async {
-                await updateData(newData.changes);
-              });
+            if(newData != null) { 
+              updateData(newData.changes);
             }
             break;
           case 'reload':
@@ -78,9 +75,7 @@ class MainMenuButton extends StatelessWidget {
                         for (var event in unreachable) {
                           changes.removeEvent(event);
                         }
-                        await AlertHandeler.dialogWhileComputing(context, () async {
-                          await updateData(changes);
-                        });
+                        updateData(changes);
                         Navigator.pop(context);
                       }, 
                       child: const Text("Radera alla"),

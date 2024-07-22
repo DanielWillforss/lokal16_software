@@ -237,7 +237,7 @@ class _DataCardListState extends State<DataCardList> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: const Text("Radera händelse"),
+                          title: Text("Radera ${widget.isName ? "användare" : "aktivitet"}"),
                           content: Text("Är du säker att du vill radera denna ${widget.isName ? "användare" : "aktivitet"}?"),
                           actions: [
                             TextButton(
@@ -284,7 +284,8 @@ class _DataCardListState extends State<DataCardList> {
 
     void scrollToIndex(int index) {
     // Calculate the position to scroll to
-      double position = scrollController.position.maxScrollExtent * indexOfEach[index] / nbrOfCards-1;
+      double cardsOnScreen = 20;
+      double position = scrollController.position.maxScrollExtent * indexOfEach[index] / (nbrOfCards-1+cardsOnScreen);
       scrollController.animateTo(
         position,
         duration: const Duration(milliseconds: 300),
@@ -300,7 +301,8 @@ class _DataCardListState extends State<DataCardList> {
             children: cards,
           ),
         ),
-        Align(
+        widget.isName 
+        ? Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
             width: 30, // Adjust the width of the button column
@@ -325,7 +327,8 @@ class _DataCardListState extends State<DataCardList> {
               }),
             ),
           ),
-        ),
+        ) 
+        : Container(),
       ],
     );
   }

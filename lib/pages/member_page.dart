@@ -65,6 +65,7 @@ class _MemberPageState extends State<MemberPage> {
         backgroundColor: Style.pink,
         title: Center(child: Text(data!.name.toString(), style: Style.headerText)),
         leading: IconButton(
+          iconSize: 36,
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
             if(wasChanged) {
@@ -83,23 +84,13 @@ class _MemberPageState extends State<MemberPage> {
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: PopupMenuButton<String>(
-              onSelected: (String result) {
-                switch (result) {
-                  case 'delete':
-                    setState(() {
-                      deleting = !deleting;
-                    });
-                    break;
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'delete',
-                  child: Text('Toggle "Ta bort Händelse"'),
-                ),
-              ],
+            child: IconButton(
               icon: const Icon(Icons.edit),
+              onPressed: () {
+                setState(() {
+                  deleting = !deleting;
+                });
+              },
             ),
           ),
         ],

@@ -19,10 +19,13 @@ class _MainViewState extends State<MainView> {
 
   DataNew? data;
   Timer? reloadPage;
+  Timer? updateDataTimer;
+  final int alarmId = 0;
 
   @override
   void dispose() {
     reloadPage?.cancel();
+    updateDataTimer?.cancel();
     super.dispose();
   }
 
@@ -79,8 +82,13 @@ class _MainViewState extends State<MainView> {
 
   late Function(Changes) updateData = (Changes changes) async {
     data!.mergeChanges(changes);
-    await data!.uploadData(context);
     setState(() {});
+    
+    updateDataTimer?.cancel();
+    updateDataTimer = Timer(const Duration(minutes: 1), () {
+      data!.uploadData(context);
+      setState(() {});
+    });
   };
 }
 

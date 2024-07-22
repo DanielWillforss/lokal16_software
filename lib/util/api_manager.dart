@@ -131,7 +131,7 @@ class GoogleSheetsApi {
         event.endTime == null ? "" : event.endTime.toString(),
         event.endTime == null ? "" : event.endTime!.date.toString(),
         event.endTime == null ? "" : event.endTime!.time.toString(),
-        event.duration()?.toStringAsFixed(2) ?? "",
+        event.duration()?.toStringAsFixed(2).replaceAll('.', ',') ?? "",
         event.member,
         event.eventType,
       ]);

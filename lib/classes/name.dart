@@ -31,7 +31,14 @@ class Name  implements Comparable<Name>{
   }
 
   String toFullStringExtended() {
-    return "$firstName $lastName $personalNumber ${paidFee}kr";
+    return "$firstName $lastName ${_maskedPersonalNumber()} ${paidFee}kr";
+  }
+
+  String _maskedPersonalNumber() {
+    if (personalNumber.length <= 4) {
+      return '****';
+    }
+    return '${personalNumber.substring(0, personalNumber.length - 4)}****';
   }
   
   @override

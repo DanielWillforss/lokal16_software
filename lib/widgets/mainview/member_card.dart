@@ -5,7 +5,6 @@ import 'package:lokal16_software/classes/data/data_new.dart';
 import 'package:lokal16_software/classes/data/member_data.dart';
 import 'package:lokal16_software/classes/event.dart';
 import 'package:lokal16_software/classes/name.dart';
-import 'package:lokal16_software/util/alert_handeler.dart';
 import 'package:lokal16_software/util/data_util.dart';
 import 'package:lokal16_software/visual/style.dart';
 
@@ -40,9 +39,7 @@ class MemberCard extends StatelessWidget {
           ) as MemberData?;
           
           if(returnData != null) {
-            await AlertHandeler.dialogWhileComputing(context, () async {
-              await updateData(returnData.changes);
-            });
+            updateData(returnData.changes);
           }
         },
         child: Text(name.toString(), textAlign: TextAlign.center,),

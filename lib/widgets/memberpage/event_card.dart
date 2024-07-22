@@ -346,7 +346,23 @@ class _EventCardState extends State<EventCard> {
             startTime = !blocked ? Time.now() : widget.previousEvent!.endTime!;
             endTime = null;
           } else {
-            startTime = !blocked ? Time.nowOtherDate(widget.data.currentDate) : widget.previousEvent!.endTime!;
+
+            TimeOfDay? pickedTime = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.now(),
+              builder: (BuildContext context, Widget? child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    alwaysUse24HourFormat: true,
+                  ),
+                  child: child!,
+                );
+              },
+            );
+
+
+            startTime = pickedTime != null ? Time.mergeTimeOfDay(Time.fromEventDate(widget.data.currentDate), pickedTime) 
+            : (!blocked ? Time.nowOtherDate(widget.data.currentDate) : widget.previousEvent!.endTime!);
             endTime = startTime.deepCopy();
             endTime.incrementMinute();
           }
@@ -471,45 +487,6 @@ class _EventCardState extends State<EventCard> {
               ),
             ],
           ),
-          //actions: [
-          //  TextButton(
-          //    onPressed: () async {
-          //      String customOption = customOptionController.text;
-          //      bool? confirmation = customOption.isEmpty ? false : await showDialog(context: context, builder: (BuildContext context) {
-          //        return AlertDialog(
-          //          title: const Text("Bekräfta val"),
-          //          content: const Text("Du skapar nu en ny aktivitet som kommer läggas permanent i listan för existerande aktivitet.\nÄr du säker på att aktiviteten inte redan ligger i listan?"),
-          //          actions: [
-          //            TextButton(
-          //              onPressed: () {
-          //                Navigator.pop(context, true);
-          //              }, 
-          //              child: const Text("Bekräfta")
-          //            ),
-          //            TextButton(
-          //              onPressed: () {
-          //                Navigator.pop(context);
-          //              }, 
-          //              child: const Text("Avbryt")
-          //            )
-          //          ],
-          //        );
-          //      });
-          //      if(confirmation == true) {
-          //        widget.data.addType(customOption);
-          //        widget.updateData();
-          //        Navigator.pop(context, customOption);
-          //      }
-          //    },
-          //    child: const Text('Skapa ny aktivitet'),
-          //  ),
-          //  TextButton(
-          //    onPressed: (() {
-          //      Navigator.pop(context);
-          //    }), 
-          //    child: const Text("Avbryt"),
-          //  ),
-          //],
         );
       },
     );
