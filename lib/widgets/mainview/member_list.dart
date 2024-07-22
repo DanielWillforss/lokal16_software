@@ -42,10 +42,13 @@ class _MemberListState extends State<MemberList> {
       int index = alphabet.indexOf(name.firstName[0]) + 1;
       nbrOfEach[index]++;
       
-      list.add(MemberCard(
-        name: name, 
-        data: widget.data,
-        updateData: widget.updateData,
+      list.add(SizedBox(
+        height: 60,
+        child: MemberCard(
+          name: name, 
+          data: widget.data,
+          updateData: widget.updateData,
+        ),
       ));
     }
     List<int> indexOfEach = List<int>.filled(29, 0);

@@ -32,7 +32,23 @@ class MemberWeb extends StatelessWidget {
     List<Name> sortedNames = data.getNamesSortedByCheckin();
     List<Positioned> idAsWidgets = [];
     
-    for (int i = 0; i< sortedNames.length; i++) {
+    for(int i = 0; i<90;i++) {
+      if(
+        (i >= 18 && i <= 19 ) ||
+        (i >= 26 && i <= 28 ) ||
+        (i >= 35 && i <= 39 ) ||
+        (i >= 45 && i <= 51 ) ||
+        (i >= 57 && i <= 64 ) ||
+        (i >= 71 && i <= 79 ) ||
+        (i >= 86 && i <= 89 )
+      ) {
+        if(i<sortedNames.length) {
+          sortedNames.insert(i, Name(firstName: "", lastName: "", personalNumber: "", paidFee: 200));
+        }
+      }
+    }
+
+    for (int i = 0; i< sortedNames.length && i<90; i++) {
 
       //Math
       final double angle = i * angleIncrement / layer;
