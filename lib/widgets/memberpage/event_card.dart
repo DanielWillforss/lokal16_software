@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lokal16_software/classes/data/member_data.dart';
 import 'package:lokal16_software/classes/event.dart';
 import 'package:lokal16_software/classes/time/time.dart';
+import 'package:lokal16_software/util/data_util.dart';
 import 'package:lokal16_software/visual/style.dart';
 
 class EventCard extends StatefulWidget {
@@ -94,8 +95,8 @@ class _EventCardState extends State<EventCard> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text("Radera händelse"),
-                      content: Text("Är du säker att du vill radera denna händelse?"),
+                      title: const Text("Radera händelse"),
+                      content: const Text("Är du säker att du vill radera denna händelse?"),
                       actions: [
                         TextButton(
                           onPressed: () {
@@ -255,7 +256,7 @@ class _EventCardState extends State<EventCard> {
   Future<bool> _checkout(Event event) async {
     bool? checkoutAnyway = false;
     bool blocked = false;
-    if(Time.isTimeBefore(Time.now(), event.startTime)) {
+    if(Time.isTimeBefore(Time.now(), event.startTime, strict: false)) {
       blocked = true;
       checkoutAnyway = await showDialog(context: context, builder: (BuildContext context) {
           return AlertDialog(
@@ -367,82 +368,148 @@ class _EventCardState extends State<EventCard> {
   Future<String?> _showEventSelectionDialog(BuildContext context) async {
 
     TextEditingController customOptionController = TextEditingController();
-    late final List<String> options = widget.data.types.toList();
-    
+    Map<String, Set<Event>> eventsByType = getSplitByType(widget.data.allEvents);
+    List<String> options = widget.data.types.toList();
+    options.sort((a, b) {
+      Set<Event> eventsA = eventsByType[a] ?? {};
+      Set<Event> eventsB = eventsByType[b] ?? {};
+      bool checkedInA = isCheckedIn(eventsA);
+      bool checkedInB = isCheckedIn(eventsB);
+      if(checkedInA && !checkedInB) {
+        return -1;
+      } else if(checkedInB && !checkedInA) {
+        return 1;
+      }
+      return a.compareTo(b);
+    });
+
     final String? result = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Välj vilken typ av event'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              SizedBox(
-                height: 200.0,  // Adjust the height as needed
-                width: double.maxFinite, // Ensure the list view takes the available width
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: options.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                      title: Text(options[index]),
-                      onTap: () {
-                        Navigator.pop(context, options[index]);
-                      },
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
-                  controller: customOptionController,
-                  decoration: const InputDecoration(
-                    hintText: 'Eller lägg till ny Aktivitet',
-                  ),
-                ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Välj aktivitet'),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                String customOption = customOptionController.text;
-                bool? confirmation = customOption.isEmpty ? false : await showDialog(context: context, builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text("Bekräfta val"),
-                    content: const Text("Du skapar nu en ny aktivitet som kommer läggas permanent i listan för existerande aktivitet.\nÄr du säker på att aktiviteten inte redan ligger i listan?"),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        }, 
-                        child: const Text("Bekräfta")
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Expanded(
+                child: SizedBox(
+                  //height: 500.0,  // Adjust the height as needed
+                  width: double.maxFinite, // Ensure the list view takes the available width
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                        color: isCheckedIn(eventsByType[options[index]] ?? {}) ? Style.blue : null,
+                        child: ListTile(
+                          title: Text(options[index]),
+                          onTap: () {
+                            Navigator.pop(context, options[index]);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20,),
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      child: TextField(
+                        controller: customOptionController,
+                        decoration: const InputDecoration(
+                          hintText: 'Eller lägg till ny Aktivitet',
+                        ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        }, 
-                        child: const Text("Avbryt")
-                      )
-                    ],
-                  );
-                });
-                if(confirmation == true) {
-                  widget.data.addType(customOption);
-                  widget.updateData();
-                  Navigator.pop(context, customOption);
-                }
-              },
-              child: const Text('Skapa ny aktivitet'),
-            ),
-            TextButton(
-              onPressed: (() {
-                Navigator.pop(context);
-              }), 
-              child: const Text("Avbryt"),
-            ),
-          ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      String customOption = customOptionController.text;
+                      bool? confirmation = customOption.isEmpty ? false : await showDialog(context: context, builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Bekräfta val"),
+                          content: const Text("Du skapar nu en ny aktivitet som kommer läggas permanent i listan för existerande aktivitet.\nÄr du säker på att aktiviteten inte redan ligger i listan?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              }, 
+                              child: const Text("Bekräfta")
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              }, 
+                              child: const Text("Avbryt")
+                            )
+                          ],
+                        );
+                      });
+                      if(confirmation == true) {
+                        widget.data.addType(customOption);
+                        widget.updateData();
+                        Navigator.pop(context, customOption);
+                      }
+                    },
+                    child: const Text('Lägg till'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          //actions: [
+          //  TextButton(
+          //    onPressed: () async {
+          //      String customOption = customOptionController.text;
+          //      bool? confirmation = customOption.isEmpty ? false : await showDialog(context: context, builder: (BuildContext context) {
+          //        return AlertDialog(
+          //          title: const Text("Bekräfta val"),
+          //          content: const Text("Du skapar nu en ny aktivitet som kommer läggas permanent i listan för existerande aktivitet.\nÄr du säker på att aktiviteten inte redan ligger i listan?"),
+          //          actions: [
+          //            TextButton(
+          //              onPressed: () {
+          //                Navigator.pop(context, true);
+          //              }, 
+          //              child: const Text("Bekräfta")
+          //            ),
+          //            TextButton(
+          //              onPressed: () {
+          //                Navigator.pop(context);
+          //              }, 
+          //              child: const Text("Avbryt")
+          //            )
+          //          ],
+          //        );
+          //      });
+          //      if(confirmation == true) {
+          //        widget.data.addType(customOption);
+          //        widget.updateData();
+          //        Navigator.pop(context, customOption);
+          //      }
+          //    },
+          //    child: const Text('Skapa ny aktivitet'),
+          //  ),
+          //  TextButton(
+          //    onPressed: (() {
+          //      Navigator.pop(context);
+          //    }), 
+          //    child: const Text("Avbryt"),
+          //  ),
+          //],
         );
       },
     );

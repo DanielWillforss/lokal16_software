@@ -1,4 +1,5 @@
 import 'package:lokal16_software/classes/event.dart';
+import 'package:lokal16_software/classes/name.dart';
 import 'package:lokal16_software/classes/time/time.dart';
 
 Set<Event> findCollitions(Set<Event> events) {
@@ -26,11 +27,34 @@ Set<Event> findCollitions(Set<Event> events) {
   return overlapping;
 }
 
+Set<Event> findUnreachable(Set<Event> events, Set<Name> names) {
+  Map<String, Set<Event>> idMap = getSplitByPerson(events);
+  Set<String> namesAsKey = names.map((name) => name.toFullString()).toSet();
+  Set<Event> unreachable = {};
+  idMap.forEach((name, subSet) {
+    if(!namesAsKey.contains(name)) {
+      unreachable.addAll(subSet);
+    }
+  });
+  
+  return unreachable;
+}
+
 Map<String, Set<Event>> getSplitByPerson(Set<Event> events) {
   Map<String, Set<Event>> idMap = {};
   for(Event event in events) {
     String person = event.member;
     Set<Event> list = idMap.putIfAbsent(person, () => {});
+    list.add(event);
+  }
+  return idMap;
+}
+
+Map<String, Set<Event>> getSplitByType(Set<Event> events) {
+  Map<String, Set<Event>> idMap = {};
+  for(Event event in events) {
+    String type = event.eventType;
+    Set<Event> list = idMap.putIfAbsent(type, () => {});
     list.add(event);
   }
   return idMap;

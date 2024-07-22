@@ -18,7 +18,7 @@ class Changes {
   Set<Event> get removedEvents => _removedEvents;
 
   void addName(Name name) {
-    _addedNames.add(name);
+    _addedNames.add(name.deepCopy());
   }
 
   void addType(String type) {
@@ -26,12 +26,12 @@ class Changes {
   }
 
   void addEvent(Event event) {
-    _addedEvents.add(event);
+    _addedEvents.add(event.deepCopy());
   }
 
   void removeName(Name name) {
-    if(!_addedNames.remove(name)) {
-      _removedNames.add(name);
+    if(!_addedNames.remove(name.deepCopy())) {
+      _removedNames.add(name.deepCopy());
     }
   }
 
@@ -42,8 +42,8 @@ class Changes {
   }
 
   void removeEvent(Event event) {
-    if(!_addedEvents.remove(event)) {
-      _removedEvents.add(event);
+    if(!_addedEvents.remove(event.deepCopy())) {
+      _removedEvents.add(event.deepCopy());
     }
   }
 
@@ -51,9 +51,9 @@ class Changes {
     _addedNames.addAll(changes.addedNames);
     _addedTypes.addAll(changes.addedTypes);
     _addedEvents.addAll(changes.addedEvents);
-    _removedNames.removeAll(changes.removedNames);
-    _removedTypes.removeAll(changes.removedTypes);
-    _removedEvents.removeAll(changes.removedEvents);
+    _removedNames.addAll(changes.removedNames);
+    _removedTypes.addAll(changes.removedTypes);
+    _removedEvents.addAll(changes.removedEvents);
   }
 
   Map<String, dynamic> toJson() {

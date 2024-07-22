@@ -74,5 +74,13 @@ class Event implements Comparable<Event>{
     }
   }
 
-  
+  Event deepCopy() {
+    return Event(
+      member: member, 
+      eventType: eventType, 
+      startTime: startTime, 
+      endTime: endTime,
+      id: id,
+    );
+  }
 }

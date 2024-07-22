@@ -8,6 +8,7 @@ class MemberData {
   late Name name;
   late Set<String> types;
   late Set<Event> events;
+  late Set<Event> allEvents;
   Changes changes = Changes();
   EventDate currentDate = EventDate.now();
 
@@ -15,6 +16,7 @@ class MemberData {
     required this.name,
     required this.types,
     required this.events,
+    required this.allEvents,
   });
 
   MemberData.empty() {
@@ -26,7 +28,20 @@ class MemberData {
     );
     types = {};
     events = {};
+    allEvents = {};
   }
+
+  //List<String> getEventsSplitByType() {
+  //  return getSplitByType(events);
+  //}
+//
+  //bool typeIsCheckedin(String type) {
+  //  Map<String, Set<Event>> eventsByType = getSplitByType(events);
+  //  if(isCheckedIn(eventsByType[type] ?? {})) {
+  //    return true;
+  //  }
+  //  return false;
+  //}
 
   bool addEvent(Event event) {
     int length = events.length;
@@ -34,6 +49,7 @@ class MemberData {
     if(events.length == length) {
       return false;
     }
+    allEvents.add(event);
     changes.addEvent(event);
     return true;
   }
@@ -41,6 +57,7 @@ class MemberData {
   void removeEvent(Event event) {
     changes.removeEvent(event);
     events.remove(event);
+    allEvents.remove(event);
   }
 
   void addType(String type) {

@@ -34,6 +34,7 @@ class DataNew {
       name: name,
       types: _types.toSet(),
       events: getSplitByPerson(_events)[name.toFullString()] ?? {},
+      allEvents: _events.toSet(),
     );
   }
 
@@ -123,12 +124,12 @@ class DataNew {
 
   void mergeChanges(Changes otherChanges) {
 
-    _names.addAll(otherChanges.addedNames);
     _names.removeAll(otherChanges.removedNames);
-    _types.addAll(otherChanges.addedTypes);
+    _names.addAll(otherChanges.addedNames);
     _types.removeAll(otherChanges.removedTypes);
-    _events.addAll(otherChanges.addedEvents);
+    _types.addAll(otherChanges.addedTypes);
     _events.removeAll(otherChanges.removedEvents);
+    _events.addAll(otherChanges.addedEvents);
 
     changes.mergeChanges(otherChanges);
     checkForTwin();
@@ -217,6 +218,10 @@ class DataNew {
   bool findOverlap() {
     overlapping = findCollitions(_events);
     return overlapping.isNotEmpty;
+  }
+
+  Set<Event> getUnreachable() {
+    return findUnreachable(_events, _names);
   }
 
   String getJsonDataString () {

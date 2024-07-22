@@ -56,7 +56,7 @@ class _MemberListState extends State<MemberList> {
 
     void scrollToIndex(int index) {
     // Calculate the position to scroll to
-    double position = scrollController.position.maxScrollExtent * indexOfEach[index] / nbrOfCards-1;
+      double position = scrollController.position.maxScrollExtent * indexOfEach[index] / nbrOfCards-1;
       scrollController.animateTo(
         position,
         duration: const Duration(milliseconds: 300),

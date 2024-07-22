@@ -29,6 +29,10 @@ class Name  implements Comparable<Name>{
   String toFullString() {
     return "$firstName $lastName $personalNumber";
   }
+
+  String toFullStringExtended() {
+    return "$firstName $lastName $personalNumber ${paidFee}kr";
+  }
   
   @override
   int compareTo(Name other) {
@@ -54,4 +58,13 @@ class Name  implements Comparable<Name>{
 
   @override
   int get hashCode => firstName.hashCode ^ lastName.hashCode ^ personalNumber.hashCode;
+
+  Name deepCopy() {
+    return Name(
+      firstName: firstName,
+      lastName: lastName,
+      personalNumber: personalNumber,
+      paidFee: paidFee
+    );
+  }
 }

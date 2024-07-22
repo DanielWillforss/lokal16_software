@@ -58,6 +58,42 @@ class MainMenuButton extends StatelessWidget {
               );
             }
             break;
+          case 'showUnreachable':
+            Set<Event> unreachable = data.getUnreachable();
+            if(unreachable.isEmpty) {
+              AlertHandeler.newAlert(context, Alerts.noCollitions);
+            } else {   
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  List<Widget> list = unreachable.isEmpty 
+                    ? [const Center(child: Text("Inga försvunna händelser"))]
+                    : unreachable.map((Event event) =>
+                      Center(child: Text(event.toString()),)
+                    ).toList();
+                  list.add(Center(
+                    child: TextButton(
+                      onPressed: () async{
+                        Changes changes = Changes();
+                        for (var event in unreachable) {
+                          changes.removeEvent(event);
+                        }
+                        await AlertHandeler.dialogWhileComputing(context, () async {
+                          await updateData(changes);
+                        });
+                        Navigator.pop(context);
+                      }, 
+                      child: const Text("Radera alla"),
+                    ),
+                  ));
+                  return SimpleDialog(
+                    title: const Center(child: Text("Alla försvunna händelser")),
+                    children: list,
+                  );
+                },
+              );
+            }
+            break;
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -72,6 +108,10 @@ class MainMenuButton extends StatelessWidget {
         const PopupMenuItem<String>(
           value: 'showOverlap',
           child: Text("Visa överlappande händelser"),
+        ),
+        const PopupMenuItem<String>(
+          value: 'showUnreachable',
+          child: Text("Visa händelser med saknad person"),
         ),
       ],
       icon: const Icon(Icons.more_vert),
