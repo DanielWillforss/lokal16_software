@@ -160,7 +160,7 @@ class GoogleSheetsApi {
           firstName: element[0] as String, 
           lastName: element[1] as String, 
           personalNumber: element[2] as String,
-          paidFee: int.tryParse(element[3] as String),
+          paidFee: element.length > 3 ? int.tryParse(element[3] as String) : null,
         ));
       }
     }
