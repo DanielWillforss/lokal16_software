@@ -155,7 +155,7 @@ class GoogleSheetsApi {
 
     Set<Name> dataList = {};
     for (var element in data) {
-      if(element.toString().isNotEmpty) {
+      if(element.toString().isNotEmpty && element.toString() != "[]") {
         dataList.add(Name(
           firstName: element[0] as String, 
           lastName: element[1] as String, 
@@ -170,7 +170,7 @@ class GoogleSheetsApi {
   Set<String> _dataToTypes(List<List<Object>> data) {
     Set<String> dataList = {};
     for (var element in data) {
-      if(element.toString().isNotEmpty) {
+      if(element.toString().isNotEmpty && element.toString() != "[]") {
         dataList.add(element[0] as String);
       }
     }
@@ -193,7 +193,7 @@ class GoogleSheetsApi {
 
     Set<Event> dataList = {};
     for (var element in data) {
-      if(element.toString().isNotEmpty) {
+      if(element.toString().isNotEmpty && element.toString() != "[]") {
         dataList.add(Event(
           member: element[8] as String, 
           eventType: element[9] as String, 

@@ -7,6 +7,7 @@ Set<Event> findCollitions(Set<Event> events) {
   Set<Event> overlapping = {};
   idMap.forEach((name, subSet) {
     List<Event> subList = subSet.toList();
+    subList.sort();
     int length = subList.length;
     for(int i = 0; i<length-1; i++) {
       Event event = subList[i];

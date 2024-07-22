@@ -95,7 +95,11 @@ class Time implements Comparable<Time>{
   }
 
   Time.mergeTimeOfDay(Time oldTime, TimeOfDay timeOfDay) {
-    _date = oldTime.date;
+    _date = EventDate(
+      oldTime.date.year,
+      oldTime.date.month,
+      oldTime.date.day,
+    );
     _time = EventTime(
       timeOfDay.hour,
       timeOfDay.minute,

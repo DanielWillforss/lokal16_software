@@ -33,6 +33,11 @@ class Alerts {
     content: "Allt ser ut som det ska", 
     button: "Fortsätt",
   );
+  static AlertText noUnreachable = AlertText(
+    title: "Inga försvunna händelser", 
+    content: "Allt ser ut som det ska", 
+    button: "Fortsätt",
+  );
   static AlertText badDate = AlertText(
     title: "Ej tillåtet datum", 
     content: "Det är inte tillåtet att välja ett framtida datum", 

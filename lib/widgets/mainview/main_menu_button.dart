@@ -42,9 +42,7 @@ class MainMenuButton extends StatelessWidget {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  List<Widget> list = data.overlapping.isEmpty 
-                    ? [const Center(child: Text("Inga överlappande händelser"))]
-                    : data.overlapping.map((Event event) =>
+                  List<Widget> list = data.overlapping.map((Event event) =>
                       Center(child: Text(event.toString()),)
                     ).toList();
                   return SimpleDialog(
@@ -58,14 +56,12 @@ class MainMenuButton extends StatelessWidget {
           case 'showUnreachable':
             Set<Event> unreachable = data.getUnreachable();
             if(unreachable.isEmpty) {
-              AlertHandeler.newAlert(context, Alerts.noCollitions);
+              AlertHandeler.newAlert(context, Alerts.noUnreachable);
             } else {   
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  List<Widget> list = unreachable.isEmpty 
-                    ? [const Center(child: Text("Inga försvunna händelser"))]
-                    : unreachable.map((Event event) =>
+                  List<Widget> list = unreachable.map((Event event) =>
                       Center(child: Text(event.toString()),)
                     ).toList();
                   list.add(Center(
