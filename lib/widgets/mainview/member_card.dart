@@ -30,17 +30,15 @@ class MemberCard extends StatelessWidget {
         backgroundColor: Style.memberButtonColor(isCheckedIn(splitByPerson[name.toFullString()] ?? {})),
         heroTag: name,
         onPressed: () async {
-          if(name.firstName != "" && name.lastName != "") {
-            MemberData arg = data.getMemberData(name);
-            MemberData? returnData = await Navigator.pushNamed(
-              context, 
-              '/page', 
-              arguments: arg,
-            ) as MemberData?;
-            
-            if(returnData != null) {
-              updateData(returnData.changes);
-            }
+          MemberData arg = data.getMemberData(name);
+          MemberData? returnData = await Navigator.pushNamed(
+            context, 
+            '/page', 
+            arguments: arg,
+          ) as MemberData?;
+          
+          if(returnData != null) {
+            updateData(returnData.changes);
           }
         },
         child: Text(name.toString(), textAlign: TextAlign.center,),

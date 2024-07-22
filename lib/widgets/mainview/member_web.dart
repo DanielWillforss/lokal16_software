@@ -50,24 +50,34 @@ class MemberWeb extends StatelessWidget {
 
     for (int i = 0; i< sortedNames.length && i<90; i++) {
 
-      //Math
-      final double angle = i * angleIncrement / layer;
-      final double x = midpoint.width + (radius * (1.3) * layer * cos(angle));
-      final double y = midpoint.height + (radius * layer * sin(angle));
+      if(!(
+        (i >= 18 && i <= 19 ) ||
+        (i >= 26 && i <= 28 ) ||
+        (i >= 35 && i <= 39 ) ||
+        (i >= 45 && i <= 51 ) ||
+        (i >= 57 && i <= 64 ) ||
+        (i >= 71 && i <= 79 ) ||
+        (i >= 86 && i <= 89 )
+      )) {
+        //Math
+        final double angle = i * angleIncrement / layer;
+        final double x = midpoint.width + (radius * (1.3) * layer * cos(angle));
+        final double y = midpoint.height + (radius * layer * sin(angle));
 
-      idAsWidgets.add(Positioned(
-        left: x,
-        top: y,
-        child: SizedBox(
-          width: 120,
-          height: 50,
-          child: MemberCard(
-            name: sortedNames[i],
-            data: data,
-            updateData: updateData,
-          ),
-        )
-      ));
+        idAsWidgets.add(Positioned(
+          left: x,
+          top: y,
+          child: SizedBox(
+            width: 120,
+            height: 50,
+            child: MemberCard(
+              name: sortedNames[i],
+              data: data,
+              updateData: updateData,
+            ),
+          )
+        ));
+      }
 
       j++;
       if(j >= 6 * layer) {

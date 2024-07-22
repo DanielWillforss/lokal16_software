@@ -85,7 +85,7 @@ class _MainViewState extends State<MainView> {
     setState(() {});
     
     updateDataTimer?.cancel();
-    updateDataTimer = Timer(const Duration(minutes: 1), () {
+    updateDataTimer = Timer(const Duration(seconds: 5), () {
       data!.uploadData(context);
       setState(() {});
     });
