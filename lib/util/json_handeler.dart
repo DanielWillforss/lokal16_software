@@ -18,4 +18,20 @@ Future<String> readData() async {
   final File file = await _getLocalFile();
   return await file.readAsString();
 }
+
+Future<File> _getBackupFile() async {
+  final directory = await getApplicationDocumentsDirectory();
+  return File('${directory.path}/backup.json');
+}
+
+Future<void> writeBackupData(DataNew data) async {
+  final file = await _getBackupFile();
+  await file.writeAsString(data.getJsonBackupDataString());
+}
+
+Future<String> readBackupData() async {
+  final File file = await _getBackupFile();
+  return await file.readAsString();
+}
+  
   

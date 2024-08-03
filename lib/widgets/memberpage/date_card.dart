@@ -29,7 +29,7 @@ class DateCard extends StatelessWidget implements PreferredSizeWidget{
               date.stepBackward();
               changeToDate(date);
             },
-            child: const Text("< Föregående", style: Style.headerText,),
+            child: const Text("< Föregående dag", style: Style.headerText,),
           ),
         ),
         Expanded(
@@ -68,7 +68,7 @@ class DateCard extends StatelessWidget implements PreferredSizeWidget{
               date.stepForward();
               changeToDate(date);
             },
-            child: Text("Nästa >", 
+            child: Text("Nästa dag >", 
               style: !Time.sameDayAs(Time.now(), Time.fromEventDate(date)) 
                 ? Style.headerText
                 : const TextStyle(

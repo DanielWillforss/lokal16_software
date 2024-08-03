@@ -20,12 +20,14 @@ class _MainViewState extends State<MainView> {
   DataNew? data;
   Timer? reloadPage;
   Timer? updateDataTimer;
+  Timer? updateBackupTimer;
   final int alarmId = 0;
 
   @override
   void dispose() {
     reloadPage?.cancel();
     updateDataTimer?.cancel();
+    updateBackupTimer?.cancel();
     super.dispose();
   }
 
@@ -59,7 +61,8 @@ class _MainViewState extends State<MainView> {
               updateData: updateData,
               reloadData: () async {
                 updateData(Changes());
-              }
+              },
+              resetToBackup: resetToBackup,
             ),
           ],
         ),     
@@ -89,6 +92,15 @@ class _MainViewState extends State<MainView> {
       data!.uploadData(context);
       setState(() {});
     });
+
+    updateBackupTimer?.cancel();
+    updateBackupTimer = Timer(const Duration(minutes: 15), () {
+      data!.saveBackupData(context);
+    });
+  };
+
+  late Function resetToBackup = () {
+    data!.restoreBackup(context);
   };
 }
 

@@ -34,15 +34,34 @@ class _MemberListState extends State<MemberList> {
   Widget build(BuildContext context) {
 
     List<Name> sortedNames = widget.data.getNamesSortedByName();
-    int nbrOfCards = sortedNames.length;
-    List<int> nbrOfEach = List<int>.filled(30, 0);
+    List<List<Widget>> listByLetter = List.generate(
+      30, 
+      (index) => index == 0 ? [] :[
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 120),
+          child: SizedBox(
+            height: 48,
+            width:  60,
+            child: Container(
+              color: Colors.grey,
+              child: Center(
+                child: Text(
+                  alphabet[index-1],
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+      ]);
     List<Widget> list = [];
 
     for(Name name in sortedNames) {
       int index = alphabet.indexOf(name.firstName[0]) + 1;
-      nbrOfEach[index]++;
       
-      list.add(SizedBox(
+      listByLetter[index].add(SizedBox(
         height: 60,
         child: MemberCard(
           name: name, 
@@ -52,15 +71,19 @@ class _MemberListState extends State<MemberList> {
       ));
     }
     List<int> indexOfEach = List<int>.filled(29, 0);
-    indexOfEach[0] = nbrOfEach[0];
+    indexOfEach[0] = listByLetter[0].length;
     for(int i = 1; i<29; i++) {
-      indexOfEach[i] = indexOfEach[i-1] + nbrOfEach[i];
+      indexOfEach[i] = indexOfEach[i-1] + listByLetter[i].length;
+    }
+
+    for(List<Widget> subList in listByLetter) {
+      list.addAll(subList);
     }
 
     void scrollToIndex(int index) {
     // Calculate the position to scroll to
       double cardsOnScreen = 17;
-      double position = scrollController.position.maxScrollExtent * indexOfEach[index] / (nbrOfCards-1-cardsOnScreen);
+      double position = scrollController.position.maxScrollExtent * indexOfEach[index] / (list.length-1-cardsOnScreen);
       scrollController.animateTo(
         position,
         duration: const Duration(milliseconds: 300),

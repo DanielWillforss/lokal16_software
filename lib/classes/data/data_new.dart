@@ -16,6 +16,7 @@ import 'package:lokal16_software/util/alerts.dart';
 import 'package:lokal16_software/util/api_manager.dart';
 import 'package:lokal16_software/util/data_util.dart';
 import 'package:lokal16_software/util/json_handeler.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class DataNew {
   Set<Name> _names = {};
@@ -142,6 +143,12 @@ class DataNew {
     bool gotOnlineData;
     GoogleSheetsApi api = GoogleSheetsApi();
     try { //Try getting online data
+      //Safety check to see if there is connection
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.none) {
+        throw const SocketException("No internet connection");
+      }
+
       await api.setupCredentials();
       mapData = await api.getAllData();
       gotOnlineData = true;
@@ -248,5 +255,68 @@ class DataNew {
         }
       }
     }
+  }
+
+  Future<void> saveBackupData(BuildContext context) async {
+    try { //Try save locally
+      await writeBackupData(this);
+    } catch (e) {
+      if (e is MissingPluginException) {
+        //await AlertHandeler.newAlert(context, Alerts.wrongPlatform);
+        //Do nothing
+      } else {
+        await AlertHandeler.newAlert(context, Alerts.jsonBackupError(e));
+      }
+    }
+  }
+
+  String getJsonBackupDataString () {
+    Map<String, dynamic> jsonData = {};
+    jsonData['time'] = Time.now().toString();
+    jsonData['names'] = _names.map((item) => item.toJson()).toList();
+    jsonData['types'] = _types.toList();
+    jsonData['events'] = _events.map((item) => item.toJson()).toList();
+    jsonData['changes'] = changes.toJson();
+    return json.encode(jsonData);
+  }
+  
+  Future<bool> restoreBackup(BuildContext context) async {
+    try {
+      String jsonString = await readBackupData();
+      Map<String, dynamic> jsonData = json.decode(jsonString);
+      
+      _names = jsonData['names'].map((item) {
+        return Name(
+          firstName: item['firstName'],
+          lastName: item['lastName'],
+          personalNumber: item['personalNumber'],
+          paidFee: item['paidFee'],
+        );
+      }).toSet;
+      _types = jsonData['activities'];
+      _events = jsonData['events'].map((item) {
+        return Event(
+          member: item['member'],
+          eventType: item['eventType'],
+          startTime: Time.fromString(item['startTime']),
+          endTime: item['endTime']  == "null" ? null : Time.fromString(item['endTime']),
+          id: item['id'],
+        );
+      }).toSet();
+
+      changes.fromJson(jsonData['changes']);
+      checkForTwin();
+
+      return true;
+    } catch (e) {
+      if(e is PathNotFoundException) {
+        await AlertHandeler.newAlert(context, Alerts.noPath);
+      } else if (e is MissingPluginException) {
+        await AlertHandeler.newAlert(context, Alerts.wrongPlatform);
+      } else {
+        await AlertHandeler.newAlert(context, Alerts.jsonError(e));
+      }
+      return false;
+    } 
   }
 }

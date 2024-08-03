@@ -11,9 +11,16 @@ class Alerts {
   );
   static AlertText jsonError(Object e) {
     return AlertText(
-      title: "Unexpected json Error", 
+      title: "Unexpected json Error - Data file", 
       content: e.toString(), 
       button: "Använd standarddata"
+    );
+  }
+  static AlertText jsonBackupError(Object e) {
+    return AlertText(
+      title: "Unexpected json Error - Backup file", 
+      content: e.toString(), 
+      button: "Stäng"
     );
   }
   static AlertText apiError(Object e) {

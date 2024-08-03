@@ -173,6 +173,7 @@ class _EventCardState extends State<EventCard> {
 
   void _setNewTime(bool isStartTime, Time newTime) {
     bool block = 
+      Time.isTimeBefore(Time.now(), newTime) ||
       (isStartTime && 
         (
           (
@@ -256,7 +257,7 @@ class _EventCardState extends State<EventCard> {
   Future<bool> _checkout(Event event) async {
     bool? checkoutAnyway = false;
     bool blocked = false;
-    if(Time.isTimeBefore(Time.now(), event.startTime, strict: false)) {
+    if(Time.isTimeBefore(Time.now(), event.startTime, strict: true)) {
       blocked = true;
       checkoutAnyway = await showDialog(context: context, builder: (BuildContext context) {
           return AlertDialog(
@@ -279,6 +280,9 @@ class _EventCardState extends State<EventCard> {
           );
         }
       );
+    } else if (Time.isTimeBefore(Time.now(), event.startTime, strict: false)) {
+      blocked = true;
+      checkoutAnyway = true;
     } else {
       checkoutAnyway = true;
     }
@@ -310,7 +314,8 @@ class _EventCardState extends State<EventCard> {
       if(
         widget.previousEvent != null && 
         widget.previousEvent!.endTime != null && 
-        Time.isTimeBefore(Time.nowOtherDate(widget.data.currentDate), widget.previousEvent!.endTime!) 
+        Time.isTimeBefore(Time.nowOtherDate(widget.data.currentDate), widget.previousEvent!.endTime!) &&
+        Time.sameDayAs(Time.now(), Time.fromEventDate(widget.data.currentDate))
       ) {
         blocked = true;
         addAnyway = await showDialog(context: context, builder: (BuildContext context) {

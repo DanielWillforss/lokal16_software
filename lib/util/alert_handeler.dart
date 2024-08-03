@@ -67,6 +67,32 @@ class AlertHandeler {
       }
     );
   }
+
+  static Future<String?> loadBackupPopup(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Återställ data'),
+          content: const Text('Är du säker på att du vill återställa datan? Ändringar gjorda inom de senaste 15 minuterna kommer att försvinna'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop("confirm"); 
+              },
+              child: const Text("Bekräfta"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); 
+              },
+              child: const Text("Avbryt"),
+            ),
+          ],
+        );
+      }
+    );
+  }
 }
 
 

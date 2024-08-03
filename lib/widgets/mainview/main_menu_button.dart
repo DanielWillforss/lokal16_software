@@ -13,11 +13,13 @@ class MainMenuButton extends StatelessWidget {
   final DataNew data;
   final Function(Changes) updateData;
   final Future<void> Function() reloadData;
+  final Function resetToBackup;
 
   const MainMenuButton({
     required this.data,
     required this.updateData,
     required this.reloadData,
+    required this.resetToBackup,
     super.key, 
   });
 
@@ -85,6 +87,12 @@ class MainMenuButton extends StatelessWidget {
               );
             }
             break;
+          case 'restoreData':
+            String? response = await AlertHandeler.loadBackupPopup(context);
+            if(response == "confirm") {
+              resetToBackup();
+            }
+            break;
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -103,6 +111,10 @@ class MainMenuButton extends StatelessWidget {
         const PopupMenuItem<String>(
           value: 'showUnreachable',
           child: Text("Visa händelser med saknad person"),
+        ),
+        const PopupMenuItem<String>(
+          value: 'restoreData',
+          child: Text("Återställ data"),
         ),
       ],
       icon: const Icon(Icons.more_vert),
