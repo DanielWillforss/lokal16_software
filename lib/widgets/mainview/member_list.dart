@@ -43,12 +43,13 @@ class _MemberListState extends State<MemberList> {
             height: 48,
             width:  60,
             child: Container(
-              color: Colors.grey,
+              color: Style.black,
               child: Center(
                 child: Text(
                   alphabet[index-1],
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),

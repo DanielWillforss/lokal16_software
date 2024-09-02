@@ -26,6 +26,7 @@ class _MemberPageState extends State<MemberPage> {
   bool deleting = false;
   Timer? inactiveTimer;
 
+  @override
   void dispose() {
     inactiveTimer?.cancel();
     super.dispose();
