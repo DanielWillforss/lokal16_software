@@ -113,7 +113,7 @@ class _MemberListState extends State<MemberList> {
                   child: Container(
                     height: (MediaQuery.of(context).size.height-100)/35, // Height of each button
                     //margin: EdgeInsets.symmetric(vertical: 2),
-                    color: Style.blue,
+                    color: Style.black,
                     alignment: Alignment.center,
                     child: Text(
                       alphabet[index],

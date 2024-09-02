@@ -203,8 +203,12 @@ class _EventCardState extends State<EventCard> {
     if(block) {
       showDialog(context: context, builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Error: Överlappande tider"),
-          content: const Text("Tiden du försöker välja är inte tillåten"),
+          title: Time.isTimeBefore(Time.now(), newTime) ? 
+            const Text("Error: Ogiltig tidpunkt") :
+            const Text("Error: Överlappande tider"), 
+          content: Time.isTimeBefore(Time.now(), newTime) ? 
+            const Text("Du kan endast välja tidpunkter som ligger bakåt i tiden") :
+            const Text("Tiden du försöker välja är inte tillåten"),
           actions: [
             TextButton(
               onPressed: () {

@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lokal16_software/classes/data/member_data.dart';
 import 'package:lokal16_software/classes/time/event_date.dart';
@@ -22,11 +24,28 @@ class _MemberPageState extends State<MemberPage> {
 
   bool wasChanged = false;
   bool deleting = false;
+  Timer? inactiveTimer;
+
+  void dispose() {
+    inactiveTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
 
     data ??= ModalRoute.of(context)?.settings.arguments as MemberData? ?? MemberData.empty();
+
+    inactiveTimer?.cancel();
+    inactiveTimer = Timer(const Duration(seconds: 10), () {
+      if(ModalRoute.of(context)?.isCurrent == true) {
+        if(wasChanged) {
+          Navigator.pop(context, data);
+        } else {
+          Navigator.pop(context);
+        } 
+      }
+    });
 
     List<Widget> cardList = [];
     List<Event> eventList = [];

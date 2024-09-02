@@ -63,20 +63,20 @@ class GoogleSheetsApi {
   }
 
   Future<List<List<Object>>> _getAllNames() async {
-    String activityData = 'Names!A2:D';
+    String activityData = 'Names!A1:D';
     List<List<Object>> data = await _getSheetData(activityData);
     
     return data;
   }
 
   Future<List<List<Object>>> _getAllTypes() async {
-    String activityData = 'EventTypes!A2:A';
+    String activityData = 'EventTypes!A1:A';
     List<List<Object>> data = await _getSheetData(activityData);
     return data;
   }
 
   Future<List<List<Object>>> _getAllEvents() async {
-    String eventData = 'EventList!A2:J';
+    String eventData = 'EventList!A1:J';
     List<List<Object>> data = await _getSheetData(eventData);
     return data;
   }
@@ -101,7 +101,12 @@ class GoogleSheetsApi {
 
   List<List<Object>> _namesToData(Set<Name> names) {
     List<List<Object>> data = [];
-    data.add([]);
+    data.add([
+      "FirstName",
+      "LastName",
+      "PersonalNumber",
+      "Member"
+    ]);
     for (Name name in names) {
       data.add([
         name.firstName,
@@ -115,7 +120,7 @@ class GoogleSheetsApi {
 
   List<List<Object>> _typesToData(Set<String> types) {
     List<List<Object>> data = [];
-    data.add([]);
+    data.add(["Types"]);
     for(String id in types) {
       data.add([id]);
     }
@@ -124,7 +129,18 @@ class GoogleSheetsApi {
 
   List<List<Object>> _eventsToData(Set<Event> events) {
     List<List<Object>> data = [];
-    data.add([]);
+    data.add([
+      "Id",
+      "DateTimeStart",
+      "DateStart",
+      "TimeStart",
+      "DateTimeEnd",
+      "DateEnd",
+      "TimeEnd",
+      "Duration",
+      "Member",
+      "EventType"
+    ]);
     for (Event event in events) {
       data.add([
         event.id.toString(),
@@ -156,6 +172,26 @@ class GoogleSheetsApi {
 
   Set<Name> _dataToNames(List<List<Object>> data) {
 
+    List<Object> title;
+    try {
+      title = data.removeAt(0);
+    } catch (e) {
+      throw const FormatException("Data is empty");
+    }
+
+    try {
+      if(
+        title[0].toString().isEmpty ||
+        title[1].toString().isEmpty ||
+        title[2].toString().isEmpty ||
+        title[3].toString().isEmpty
+      ) {
+        throw Exception();
+      }
+    } catch (e) {
+      throw const FormatException("Faulty Data");
+    }
+
     Set<Name> dataList = {};
     for (var element in data) {
       if(element.toString().isNotEmpty && element.toString() != "[]") {
@@ -171,6 +207,25 @@ class GoogleSheetsApi {
   }
 
   Set<String> _dataToTypes(List<List<Object>> data) {
+
+    List<Object> title;
+    try {
+      title = data.removeAt(0);
+    } catch (e) {
+      throw const FormatException("Data is empty");
+    }
+
+
+    try {
+      if(
+        title[0].toString().isEmpty
+      ) {
+        throw Exception();
+      }
+    } catch (e) {
+      throw const FormatException("Faulty Data");
+    }
+
     Set<String> dataList = {};
     for (var element in data) {
       if(element.toString().isNotEmpty && element.toString() != "[]") {
@@ -192,6 +247,32 @@ class GoogleSheetsApi {
     //period
     //person - needed
     //aktivitet - needed
+
+    List<Object> title;
+    try {
+      title = data.removeAt(0);
+    } catch (e) {
+      throw const FormatException("Data is empty");
+    }
+
+    try {
+      if(
+        title[0].toString().isEmpty ||
+        title[1].toString().isEmpty ||
+        title[2].toString().isEmpty ||
+        title[3].toString().isEmpty ||
+        title[4].toString().isEmpty ||
+        title[5].toString().isEmpty ||
+        title[6].toString().isEmpty ||
+        title[7].toString().isEmpty ||
+        title[8].toString().isEmpty ||
+        title[9].toString().isEmpty
+      ) {
+        throw Exception();
+      }
+    } catch (e) {
+      throw const FormatException("Faulty Data");
+    }
 
 
     Set<Event> dataList = {};
