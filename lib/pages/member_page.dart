@@ -38,7 +38,7 @@ class _MemberPageState extends State<MemberPage> {
     data ??= ModalRoute.of(context)?.settings.arguments as MemberData? ?? MemberData.empty();
 
     inactiveTimer?.cancel();
-    inactiveTimer = Timer(const Duration(seconds: 10), () {
+    inactiveTimer = Timer(const Duration(minutes: 1), () {
       if(ModalRoute.of(context)?.isCurrent == true) {
         if(wasChanged) {
           Navigator.pop(context, data);
